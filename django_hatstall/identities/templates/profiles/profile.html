@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+{% with active_page="profiles" %}
+
+{% block title %}Profile Information{% endblock %}
+
+{% block head %}
+    {{ block.super }}
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('#orgsTable').DataTable();
+            $('#identitiesTable').DataTable();
+
+            $('#editProfileData').click(function(){
+                $('#profileData input').removeAttr('readonly').removeClass('form-control-plaintext').addClass('form-control');
+                $('#submitProfileData').removeAttr('hidden');
+                $(this).attr('hidden', '');
+            });
+
+            $('#addEnrollmentsBtn').click(function(){
+                $('#organizations').removeAttr('hidden');
+            });
+
+            $('#addIdentitiesBtn').click(function(){
+                $('#identities').removeAttr('hidden');
+            });
+
+            $('#closeOrganizations').click(function(){
+                $('#organizations').attr('hidden','');
+            });
+
+            $('#closeIdentities').click(function(){
+                $('#identities').attr('hidden','');
+            });
+
+            $('.input-daterange input').datepicker({
+                format: 'yyyy-mm-dd',
+                // defaultViewDate: function(){ return $(this).val().substr(0,$(this).val().indexOf(' '))}
+            });
+            $('.input-daterange input').each(function() {
+                var datepick = $(this).val();
+                var formated_date = datepick.substr(0,datepick.indexOf(' '));
+                $(this).datepicker('setDate', formated_date);
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block body %}
+<h1>Profile info / <small>{{profile.profile.uuid}}</small></h1>
+<div class="row">
+    <div class="col-md-5">
+        <div class="row">
+            <div class="col-lg-12">
+                <form id="profileData" action="" method="POST">
+                    <div class="form-group row">
+                        <label for="profileName" class="col-sm-2 col-form-label"><b>Name</b></label>
+                        <input name="name" type="text" readonly class="col-sm-10 form-control-plaintext" id="profileName" value="{{profile.profile.name}}">
+                    </div>
+                    <div class="form-group row">
+                        <label for="profileEmail" class="col-sm-2 col-form-label"><b>e-mail</b></label>
+                        <input name="email" type="text" readonly class="col-sm-10 form-control-plaintext" id="profileEmail" value="{{profile.profile.email}}">
+                    </div>
+                    <div class="form-group row">
+                        <label for="profileBot" class="col-sm-2 col-form-label"><b>Bot?</b></label>
+                        <input name="bot" type="text" readonly class="col-sm-10 form-control-plaintext" id="profileBot" value="{{profile.profile.is_bot}}">
+                    </div>
+                    <div class="form-group row">
+                        <label for="profileCountry" class="col-sm-2 col-form-label"><b>Country</b></label>
+                        <input name="country" type="text" readonly class="col-sm-10 form-control-plaintext" id="profileEmail" value="{{profile.profile.country}}">
+                    </div>
+                    <span id="editProfileData" class="btn btn-primary">Edit</span>
+                    <button type="submit" class="btn btn-success" id="submitProfileData" hidden>Submit</button>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <h2 class="float-left">Enrollments</h2>
+                <button id="addEnrollmentsBtn" type="button" class="btn btn-primary btn-sm float-right">Add <span class="sr-only">enrollments</span></button>
+                <table class="table table-striped table-sm" id="profileEnrollments">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Organization</th>
+                            <th>Dates</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for enrollment in enrollments %}
+                        <form action="/profiles/{{profile.profile.uuid}}/update_enrollment/{{enrollment.organization.name}}" method="POST">
+                            <tr>
+                                <td>{{enrollment.organization.name}}</td>
+                                <td>
+                                    <div class="input-group input-daterange">
+                                        <input type="text" class="form-control" name="start_date" value="{{enrollment.start}}">
+                                        <div class="input-group-addon">to</div>
+                                        <input type="text" class="form-control" name="end_date" value="{{enrollment.end}}">
+                                    </div>
+                                    <input type="text" readonly hidden name="old_start_date" value="{{enrollment.start}}">
+                                    <input type="text" readonly hidden name="old_end_date" value="{{enrollment.end}}">
+                                </td>
+                                <td>
+                                    <button type="submit" class="btn btn-sm btn-success">Update</button>
+                                </td>
+                                <td>
+                                    <a href="/profiles/{{profile.profile.uuid}}/unenroll_from/{{enrollment.organization.name}}_{{enrollment.start}}_{{enrollment.end}}">un-enroll</a>
+                                </td>
+                            </tr>
+                        </form>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <h2 class="float-left">Profile Identitites</h2>
+                <button id="addIdentitiesBtn" type="button" class="btn btn-primary btn-sm float-right">Add <span class="sr-only">identities</span></button>
+                <table class="table table-striped table-sm" id="profileIdsTable">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Name</th>
+                            <th>email</th>
+                            <th>Username</th>
+                            <th>Source</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for identity in profile.identities %}
+                        <tr>
+                            <td>{{identity.name}}</td>
+                            <td>{{identity.email}}</td>
+                            <td>{{identity.username}}</td>
+                            <td>{{identity.source}}</td>
+                            <td>
+                                {% if profile.profile.uuid != identity.id %}
+                                <a href="/profiles/{{profile.profile.uuid}}/unmerge/{{identity.id}}">unmerge</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-7">
+        <div id="organizations" hidden class="row">
+            <div class="col-lg-12">
+                <h2 class="float-left">Organizations</h2>
+                <button id="closeOrganizations" type="button" class="close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <table class="table table-striped" id="orgsTable">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Name</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for org in orgs %}
+                        <tr>
+                            <td>{{org.name}}</td>
+                            <td><a href="/profiles/{{profile.profile.uuid}}/enroll_in/{{org.name}}">enroll</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div id="identities" hidden class="row">
+            <div class="col-lg-12">
+                <h2 class="float-left">Identities</h2>
+                <button id="closeIdentities" type="button" class="close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                <form action="./{{profile.profile.uuid}}/merge" method="POST">
+                    <table class="table table-striped" id="identitiesTable">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th></th>
+                                <th>Name</th>
+                                <th>email</th>
+                                <th>Username</th>
+                                <th>Source</th>
+                                <th>uuids.</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <td colspan="6"><input type="submit" value="Merge" class="btn btn-success"></td>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                            {% for identity in identities %}
+                            <tr>
+                                <td><input type="checkbox" name="uuid" value="{{identity.uuid}}"></td>
+                                <td>{{identity.name}}</td>
+                                <td>{{identity.email}}</td>
+                                <td>{{identity.username}}</td>
+                                <td>{{identity.source}}</td>
+                                <td><a href="/profiles/{{identity.uuid}}">view</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% endwith  %}

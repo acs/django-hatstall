@@ -5,6 +5,7 @@ import sortinghat.api
 
 from sortinghat.db.database import Database
 from sortinghat.db.model import UniqueIdentity
+from sortinghat.db.model import Identity
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -29,7 +30,14 @@ def list(request):
     return HttpResponse(render_profiles(sh_db, request))
 
 def identity(request, identity_id):
-    return HttpResponse("Showing the profile: " + str(identity_id))
+    err = None
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    sh_db_cfg = "shdb.cfg"
+    sh_db = sortinghat_db_conn(sh_db_cfg)
+    if request.method == 'POST':
+        err = update_profile(identity_id, request.form)
+    return HttpResponse(render_profile(sh_db, identity_id, request, err))
 
 
 #
@@ -84,3 +92,27 @@ def render_profiles(db, request, err=None):
     # return unique_identities
     # return render(request, 'profiles.html', {})
     # return render_template('profiles.html', uids=unique_identities, err=err)
+
+def render_profile(db, profile_uuid, request, err=None):
+    """
+    Render unique identity profile page
+    It shows also sections to add enrollments and merge remaining
+    identities
+    """
+    orgs = sortinghat.api.registry(db)
+    remaining_identities = []
+    profile_enrollments = []
+    with db.connect() as session:
+        profile_info = session.query(UniqueIdentity).\
+            filter(UniqueIdentity.uuid == profile_uuid).first()
+        profile_identities = [x.id for x in profile_info.identities]
+        for identity in session.query(Identity).filter(Identity.id.notin_(profile_identities)):
+            remaining_identities.append(identity)
+        for enrollment in profile_info.enrollments:
+            profile_enrollments.append(enrollment)
+        session.expunge_all()
+    context = {
+        "profile": profile_info.to_dict(), "orgs": orgs, "identities": remaining_identities, "enrollments": profile_info.enrollments, "err":err
+    }
+    template = loader.get_template('profiles/profile.html')
+    return template.render(context, request)
