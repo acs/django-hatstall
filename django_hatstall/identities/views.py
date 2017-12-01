@@ -36,7 +36,7 @@ def identity(request, identity_id):
     sh_db_cfg = "shdb.cfg"
     sh_db = sortinghat_db_conn(sh_db_cfg)
     if request.method == 'POST':
-        err = update_profile(identity_id, request.form)
+        err = update_profile(sh_db, identity_id, request.POST)
     return HttpResponse(render_profile(sh_db, identity_id, request, err))
 
 
@@ -116,3 +116,18 @@ def render_profile(db, profile_uuid, request, err=None):
     }
     template = loader.get_template('profiles/profile.html')
     return template.render(context, request)
+
+def update_profile(db, uuid, profile_data):
+    """
+    Update profile
+    """
+    try:
+        sortinghat.api.edit_profile(db, uuid, name=profile_data['name'],\
+            email=profile_data['email'], is_bot=profile_data['bot'] == 'True',\
+            country=profile_data['country'])
+        err = None
+    except sortinghat.exceptions.NotFoundError as error:
+        err = error
+    except sortinghat.exceptions.WrappedValueError as error:
+        err = error
+    return err

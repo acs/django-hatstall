@@ -51,7 +51,7 @@
     <div class="col-md-5">
         <div class="row">
             <div class="col-lg-12">
-                <form id="profileData" action="" method="POST">
+                <form id="profileData" action="" method="POST">{% csrf_token %}
                     <div class="form-group row">
                         <label for="profileName" class="col-sm-2 col-form-label"><b>Name</b></label>
                         <input name="name" type="text" readonly class="col-sm-10 form-control-plaintext" id="profileName" value="{{profile.profile.name}}">
