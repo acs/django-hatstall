@@ -104,7 +104,7 @@
                                     <button type="submit" class="btn btn-sm btn-success">Update</button>
                                 </td>
                                 <td>
-                                    <a href="/profiles/{{profile.profile.uuid}}/unenroll_from/{{enrollment.organization.name}}_{{enrollment.start}}_{{enrollment.end}}">un-enroll</a>
+                                    <a href="/profiles/{{profile.profile.uuid}}/unenroll_from/{{enrollment.organization.name}}_{{enrollment.start|date:'Y-m-d H:i:s'}}_{{enrollment.end|date:'Y-m-d H:i:s'}}">un-enroll</a>
                                 </td>
                             </tr>
                         </form>

@@ -61,6 +61,23 @@ def update_enrollment(request, identity_id, organization):
     sortinghat.api.add_enrollment(db, identity_id, organization, start_date, end_date)
     return redirect('/profiles/' + identity_id)
 
+def unenroll_profile(request, identity_id, organization_info):
+    """
+    Un-enroll a profile uuid from an organization
+    """
+    err = None
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    if request.method == 'POST':
+        return redirect('/profiles/' + identity_id)
+    sh_db_cfg = "shdb.cfg"
+    db = sortinghat_db_conn(sh_db_cfg)
+    org_name = organization_info.split('_')[0]
+    org_start = parser.parse(organization_info.split('_')[1])
+    org_end = parser.parse(organization_info.split('_')[2])
+    sortinghat.api.delete_enrollment(db, identity_id, org_name, org_start, org_end)
+    return redirect('/profiles/' + identity_id)
+
 #
 # HELPER METHODS FOR VIEWS
 #
