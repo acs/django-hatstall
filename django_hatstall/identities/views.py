@@ -1,5 +1,6 @@
 import configparser
 import json
+from dateutil import parser
 
 import sortinghat.api
 
@@ -39,6 +40,26 @@ def identity(request, identity_id):
         err = update_profile(sh_db, identity_id, request.POST)
     return HttpResponse(render_profile(sh_db, identity_id, request, err))
 
+def update_enrollment(request, identity_id, organization):
+    """
+    Update profile enrollment dates
+    It first removes old enrollment
+    and creates a new one (base on the new dates)
+    """
+    err = None
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    if request.method != 'POST':
+        return redirect('profiles/list')
+    sh_db_cfg = "shdb.cfg"
+    db = sortinghat_db_conn(sh_db_cfg)
+    old_start_date = parser.parse(request.POST.get('old_start_date'))
+    old_end_date = parser.parse(request.POST.get('old_end_date'))
+    start_date = parser.parse(request.POST.get('start_date'))
+    end_date = parser.parse(request.POST.get('end_date'))
+    sortinghat.api.delete_enrollment(db, identity_id, organization, old_start_date, old_end_date)
+    sortinghat.api.add_enrollment(db, identity_id, organization, start_date, end_date)
+    return redirect('/profiles/' + identity_id)
 
 #
 # HELPER METHODS FOR VIEWS

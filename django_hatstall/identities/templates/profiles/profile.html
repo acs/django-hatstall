@@ -88,17 +88,17 @@
                     </thead>
                     <tbody>
                         {% for enrollment in enrollments %}
-                        <form action="/profiles/{{profile.profile.uuid}}/update_enrollment/{{enrollment.organization.name}}" method="POST">
+                        <form action="/profiles/{{profile.profile.uuid}}/update_enrollment/{{enrollment.organization.name}}" method="POST">{% csrf_token %}
                             <tr>
                                 <td>{{enrollment.organization.name}}</td>
                                 <td>
                                     <div class="input-group input-daterange">
-                                        <input type="text" class="form-control" name="start_date" value="{{enrollment.start}}">
+                                        <input type="text" class="form-control" name="start_date" value="{{enrollment.start|date:'Y-m-d H:i:s'}}">
                                         <div class="input-group-addon">to</div>
-                                        <input type="text" class="form-control" name="end_date" value="{{enrollment.end}}">
+                                        <input type="text" class="form-control" name="end_date" value="{{enrollment.end|date:'Y-m-d H:i:s'}}">
                                     </div>
-                                    <input type="text" readonly hidden name="old_start_date" value="{{enrollment.start}}">
-                                    <input type="text" readonly hidden name="old_end_date" value="{{enrollment.end}}">
+                                    <input type="text" readonly hidden name="old_start_date" value="{{enrollment.start|date:'Y-m-d H:i:s'}}">
+                                    <input type="text" readonly hidden name="old_end_date" value="{{enrollment.end|date:'Y-m-d H:i:s'}}">
                                 </td>
                                 <td>
                                     <button type="submit" class="btn btn-sm btn-success">Update</button>
