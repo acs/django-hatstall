@@ -78,6 +78,24 @@ def unenroll_profile(request, identity_id, organization_info):
     sortinghat.api.delete_enrollment(db, identity_id, org_name, org_start, org_end)
     return redirect('/profiles/' + identity_id)
 
+def enroll_to_profile(request, identity_id, organization):
+    """
+    Enroll a profile uuid into an organization
+    """
+    err = None
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    if request.method == 'POST':
+        return redirect('/profiles/' + identity_id)
+    sh_db_cfg = "shdb.cfg"
+    db = sortinghat_db_conn(sh_db_cfg)
+    try:
+        sortinghat.api.add_enrollment(db, identity_id, organization)
+        err = None
+    except sortinghat.exceptions.AlreadyExistsError as error:
+        err = error
+    return redirect('/profiles/' + identity_id)
+
 #
 # HELPER METHODS FOR VIEWS
 #
