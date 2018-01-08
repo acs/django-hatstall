@@ -19,7 +19,7 @@ from django.template import loader
 
 
 def index(request):
-    return HttpResponse("Hello, world. You're at the profiles index.")
+    return redirect('/profiles/list')
 
 def list(request):
     if not request.user.is_authenticated:
