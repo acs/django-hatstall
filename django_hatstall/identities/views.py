@@ -152,6 +152,16 @@ def organizations(request):
     template = loader.get_template('organizations/organizations.html')
     return HttpResponse(template.render(context, request))
 
+def about_render(request, err=None):
+    """
+    Render index page
+    """
+    context = {
+        "err":err
+    }
+    template = loader.get_template('about/about.html')
+    return HttpResponse(template.render(context, request))
+
 #
 # HELPER METHODS FOR VIEWS
 #
