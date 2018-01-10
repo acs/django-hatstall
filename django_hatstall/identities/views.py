@@ -19,6 +19,8 @@ from django.template import loader
 
 
 def index(request):
+    if request.method == 'POST':
+        err = merge(request.POST.getlist('uuid'))
     return redirect('/profiles/list')
 
 def list(request):

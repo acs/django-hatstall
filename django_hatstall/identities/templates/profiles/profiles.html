@@ -14,7 +14,7 @@
 
 {% block body %}
 <h1>Profiles</h1>
-<form action="/profiles" method="POST">
+<form action="/profiles/" method="POST">{% csrf_token %}
 
     <table class="table table-striped" id="myTable">
         <thead class="thead-dark">
