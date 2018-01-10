@@ -130,6 +130,28 @@ def unmerge(request, profile_uuid, identity_id):
     session.expunge_all()
     return redirect('/profiles/' + profile_uuid)
 
+def organizations(request):
+    """
+    Render organizations page
+    """
+    err = None
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    sh_db_cfg = "shdb.cfg"
+    db = sortinghat_db_conn(sh_db_cfg)
+    if request.method == 'POST':
+        try:
+            sortinghat.api.add_organization(db, request.POST.get('name'))
+        except sortinghat.exceptions.AlreadyExistsError as error:
+            err = error
+    orgs = sortinghat.api.registry(db)
+    domains = sortinghat.api.domains(db)
+    context = {
+        "orgs": orgs, "domains": domains, "err":err
+    }
+    template = loader.get_template('organizations/organizations.html')
+    return HttpResponse(template.render(context, request))
+
 #
 # HELPER METHODS FOR VIEWS
 #

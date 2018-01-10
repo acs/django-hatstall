@@ -21,6 +21,7 @@ urlpatterns = [
     url(r'^$', include('identities.urls')),
     url(r'^identities/', include('identities.urls')),
     url(r'^profiles/', include('identities.urls')),
+    url(r'^organizations/', include('identities.orgs_urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^accounts/login/$', auth_views.LoginView.as_view()),
     url('^', include('django.contrib.auth.urls'))
