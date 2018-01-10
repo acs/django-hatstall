@@ -177,7 +177,7 @@
                 <button id="closeIdentities" type="button" class="close" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
-                <form action="./{{profile.profile.uuid}}/merge" method="POST">
+                <form action="/profiles/{{profile.profile.uuid}}/merge" method="POST">{% csrf_token %}
                     <table class="table table-striped" id="identitiesTable">
                         <thead class="thead-dark">
                             <tr>

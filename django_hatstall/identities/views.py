@@ -96,10 +96,57 @@ def enroll_to_profile(request, identity_id, organization):
         err = error
     return redirect('/profiles/' + identity_id)
 
+def merge_to_profile(request, identity_id):
+    """
+    Merge a list of unique profiles to the profile
+    """
+    err = None
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    if request.method != 'POST':
+        return redirect('/profiles/' + identity_id)
+    uuids = request.POST.getlist('uuid')
+    uuids.append(identity_id)
+    err = merge(uuids)
+    return redirect('/profiles/' + identity_id)
+
+def unmerge(request, profile_uuid, identity_id):
+    """
+    Unmerge a given identity from a unique identity, creating a new unique identity
+    """
+    err = None
+    if not request.user.is_authenticated:
+        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    if request.method != 'GET':
+        return redirect('/profiles/' + profile_uuid)
+    sh_db_cfg = "shdb.cfg"
+    db = sortinghat_db_conn(sh_db_cfg)
+    sortinghat.api.move_identity(db, identity_id, identity_id)
+    with db.connect() as session:
+        edit_identity = session.query(Identity).filter(Identity.uuid == identity_id).first()
+        uid_profile_name = edit_identity.name
+        uid_profile_email = edit_identity.email
+        sortinghat.api.edit_profile(db, identity_id, name=uid_profile_name, email=uid_profile_email)
+    session.expunge_all()
+    return redirect('/profiles/' + profile_uuid)
+
 #
 # HELPER METHODS FOR VIEWS
 #
 
+def merge(uuids):
+    """
+    Merge a set of profiles given the list of uuids
+    """
+    sh_db_cfg = "shdb.cfg"
+    db = sortinghat_db_conn(sh_db_cfg)
+    if len(uuids) > 1:
+        for uuid in uuids[:-1]:
+            sortinghat.api.merge_unique_identities(db, uuid, uuids[-1])
+            err = None
+    else:
+        err = "You need at least 2 profiles to merge them"
+    return err
 
 def parse_shdb_config_file(filename):
     """
