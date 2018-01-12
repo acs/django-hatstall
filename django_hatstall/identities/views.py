@@ -274,7 +274,7 @@ def update_profile(db, uuid, profile_data):
     try:
         sortinghat.api.edit_profile(db, uuid, name=profile_data['name'],
                                     email=profile_data['email'], is_bot=profile_data['bot'] == 'True',
-                                    country=profile_data['country'])
+                                    country_code=profile_data['country'])
         err = None
     except sortinghat.exceptions.NotFoundError as error:
         err = error
