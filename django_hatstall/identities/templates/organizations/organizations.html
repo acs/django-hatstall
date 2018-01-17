@@ -22,7 +22,7 @@
 
 {% block body %}
 <div class="row">
-    <div class="col-sm-4">
+    <div class="col-sm-6">
             <button id="addOrgBtn" type="button" class="btn btn-primary btn-sm float-right">Add <span class="sr-only">organization</span></button>
         <h1>Organizations</h1>
         <table class="table table-striped" id="orgsTable">
@@ -41,7 +41,7 @@
         </table>
     </div>
 
-    <div class="col-sm-4">
+    <div class="col-sm-6">
         <form hidden id="addOrg" action="" method="POST">{% csrf_token %}
             <button id="closeAddOrg" type="button" class="close" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
@@ -56,25 +56,6 @@
         </form>
     </div>
 
-    <div class="col-sm-4">
-        <h1>Domains and organizations</h1>
-        <table class="table table-striped" id="domsTable">
-            <thead class="thead-dark">
-                <tr>
-                    <th>Name</th>
-                    <th>Domain</th>
-                </tr>
-            </thead>
-            <tbody>
-                {%  for domain in domains %}
-                <tr>
-                    <td>{{domain.organization.name}}</td>
-                    <td>{{domain.domain}}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
 </div>
 {% endblock %}
 {% endwith  %}

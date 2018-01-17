@@ -154,9 +154,8 @@ def organizations(request):
         except sortinghat.exceptions.AlreadyExistsError as error:
             err = error
     orgs = sortinghat.api.registry(db)
-    domains = sortinghat.api.domains(db)
     context = {
-        "orgs": orgs, "domains": domains, "err": err
+        "orgs": orgs, "err": err
     }
     template = loader.get_template('organizations/organizations.html')
     return HttpResponse(template.render(context, request))
