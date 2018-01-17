@@ -258,10 +258,11 @@ def render_profile(db, profile_uuid, request, err=None):
             remaining_identities.append(identity)
         for enrollment in profile_info.enrollments:
             profile_enrollments.append(enrollment)
+        countries = sortinghat.api.countries(db)
         session.expunge_all()
     context = {
         "profile": profile_info.to_dict(), "orgs": orgs, "identities": remaining_identities,
-        "enrollments": profile_info.enrollments, "err": err
+        "enrollments": profile_info.enrollments, "countries": countries, "err": err
     }
     template = loader.get_template('profiles/profile.html')
     return template.render(context, request)
