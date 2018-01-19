@@ -272,8 +272,12 @@ def update_profile(db, uuid, profile_data):
     Update profile
     """
     try:
+        if 'bot' in profile_data:
+            user_bot = profile_data['bot']
+        else:
+            user_bot = 'False'
         sortinghat.api.edit_profile(db, uuid, name=profile_data['name'],
-                                    email=profile_data['email'], is_bot=profile_data['bot'] == 'True',
+                                    email=profile_data['email'], is_bot=user_bot == 'True',
                                     country_code=profile_data['country'])
         err = None
     except sortinghat.exceptions.NotFoundError as error:

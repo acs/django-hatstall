@@ -15,6 +15,7 @@
                 $('#submitProfileData').removeAttr('hidden');
                 $(this).attr('hidden', '');
                 $('#countrySelect').prop('disabled', false);
+                $('#profileBot').removeAttr('disabled')
             });
 
             $('#addEnrollmentsBtn').click(function(){
@@ -44,6 +45,15 @@
             });
 
             $('#countrySelect').val("{{profile.profile.country.code}}")
+            if($('#profileBot').val() == 'True'){
+              $('#profileBot').prop('checked', 'true');
+            }
+
+            $('#profileBot').change(function () {
+              if($('#profileBot').is(':checked')){
+                $('#profileBot').val('True');
+              }
+            });
         });
     </script>
 {% endblock %}
@@ -65,11 +75,11 @@
                     </div>
                     <div class="form-group row">
                         <label for="profileBot" class="col-sm-2 col-form-label"><b>Bot?</b></label>
-                        <input name="bot" type="text" readonly class="col-sm-10 form-control-plaintext" id="profileBot" value="{{profile.profile.is_bot}}">
+                        <input name="bot" type="checkbox" class="col-sm-10 form-control-plaintext" style="height:20px;margin-top:8px" id="profileBot" value="{{profile.profile.is_bot}}" disabled>
                     </div>
                     <div class="form-group row">
                         <label for="profileCountry" class="col-sm-2 col-form-label"><b>Country</b></label>
-                        <select id="countrySelect" name="country" type="text" disabled="true" class="col-sm-10 form-control" id="profileCountry" value="{{profile.profile.country.code}}">
+                        <select id="countrySelect" name="country" type="text" disabled="true" class="col-sm-10 form-control" id=" profileCountry" value="{{profile.profile.country.code}}">
                           {% for country in countries %}
                             <option value="{{country.code}}">{{country.name}}</option>
                           {% endfor %}
