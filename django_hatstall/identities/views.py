@@ -16,6 +16,12 @@ from django.template import loader
 # VIEWS
 #
 
+# Global vars
+shdb_user = ""
+shdb_pass = ""
+shdb_name = ""
+shdb_host = ""
+
 
 def index(request):
     if request.method == 'POST':
@@ -26,8 +32,10 @@ def index(request):
 def list(request):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
-    sh_db_cfg = "shdb.cfg"
-    sh_db = sortinghat_db_conn(sh_db_cfg)
+    if (not shdb_name) or (not shdb_name) or (not shdb_host):
+        return redirect('/shdb/params')
+    # sh_db_cfg = "shdb.cfg"
+    sh_db = sortinghat_db_conn()
     # uuids = render_profiles(sh_db, request)
     # return HttpResponse("Listing all profiles: " + json.dumps(uuids))
     return HttpResponse(render_profiles(sh_db, request))
@@ -37,8 +45,9 @@ def identity(request, identity_id):
     err = None
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
-    sh_db_cfg = "shdb.cfg"
-    sh_db = sortinghat_db_conn(sh_db_cfg)
+    if (not shdb_name) or (not shdb_name) or (not shdb_host):
+        return redirect('/shdb/params')
+    sh_db = sortinghat_db_conn()
     if request.method == 'POST':
         err = update_profile(sh_db, identity_id, request.POST)
     return HttpResponse(render_profile(sh_db, identity_id, request, err))
@@ -53,10 +62,11 @@ def update_enrollment(request, identity_id, organization):
     err = None
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    if (not shdb_name) or (not shdb_name) or (not shdb_host):
+        return redirect('/shdb/params')
     if request.method != 'POST':
         return redirect('profiles/list')
-    sh_db_cfg = "shdb.cfg"
-    db = sortinghat_db_conn(sh_db_cfg)
+    db = sortinghat_db_conn()
     old_start_date = parser.parse(request.POST.get('old_start_date'))
     old_end_date = parser.parse(request.POST.get('old_end_date'))
     start_date = parser.parse(request.POST.get('start_date'))
@@ -73,10 +83,11 @@ def unenroll_profile(request, identity_id, organization_info):
     err = None
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    if (not shdb_name) or (not shdb_name) or (not shdb_host):
+        return redirect('/shdb/params')
     if request.method == 'POST':
         return redirect('/profiles/' + identity_id)
-    sh_db_cfg = "shdb.cfg"
-    db = sortinghat_db_conn(sh_db_cfg)
+    db = sortinghat_db_conn()
     org_name = organization_info.split('_')[0]
     org_start = parser.parse(organization_info.split('_')[1])
     org_end = parser.parse(organization_info.split('_')[2])
@@ -91,10 +102,11 @@ def enroll_to_profile(request, identity_id, organization):
     err = None
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    if (not shdb_name) or (not shdb_name) or (not shdb_host):
+        return redirect('/shdb/params')
     if request.method == 'POST':
         return redirect('/profiles/' + identity_id)
-    sh_db_cfg = "shdb.cfg"
-    db = sortinghat_db_conn(sh_db_cfg)
+    db = sortinghat_db_conn()
     try:
         sortinghat.api.add_enrollment(db, identity_id, organization)
         err = None
@@ -110,6 +122,8 @@ def merge_to_profile(request, identity_id):
     err = None
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    if (not shdb_name) or (not shdb_name) or (not shdb_host):
+        return redirect('/shdb/params')
     if request.method != 'POST':
         return redirect('/profiles/' + identity_id)
     uuids = request.POST.getlist('uuid')
@@ -125,10 +139,11 @@ def unmerge(request, profile_uuid, identity_id):
     err = None
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+    if (not shdb_name) or (not shdb_name) or (not shdb_host):
+        return redirect('/shdb/params')
     if request.method != 'GET':
         return redirect('/profiles/' + profile_uuid)
-    sh_db_cfg = "shdb.cfg"
-    db = sortinghat_db_conn(sh_db_cfg)
+    db = sortinghat_db_conn()
     sortinghat.api.move_identity(db, identity_id, identity_id)
     with db.connect() as session:
         edit_identity = session.query(Identity).filter(Identity.uuid == identity_id).first()
@@ -146,8 +161,9 @@ def organizations(request):
     err = None
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
-    sh_db_cfg = "shdb.cfg"
-    db = sortinghat_db_conn(sh_db_cfg)
+    if (not shdb_name) or (not shdb_name) or (not shdb_host):
+        return redirect('/shdb/params')
+    db = sortinghat_db_conn()
     if request.method == 'POST':
         try:
             sortinghat.api.add_organization(db, request.POST.get('name'))
@@ -158,6 +174,28 @@ def organizations(request):
         "orgs": orgs, "err": err
     }
     template = loader.get_template('organizations/organizations.html')
+    return HttpResponse(template.render(context, request))
+
+
+def get_shdb_params(request, err=None):
+    """
+    Render organizations page
+    """
+    global shdb_user
+    global shdb_pass
+    global shdb_name
+    global shdb_host
+    if request.method == 'POST':
+        shdb_user = request.POST.get('shdb_user_form')
+        shdb_pass = request.POST.get('shdb_pass_form')
+        shdb_name = request.POST.get('shdb_name_form')
+        shdb_host = request.POST.get('shdb_host_form')
+    if shdb_user and shdb_name and shdb_host:
+        return redirect('/profiles/list')
+    context = {
+        "err": err
+    }
+    template = loader.get_template('shdb/shdb_form.html')
     return HttpResponse(template.render(context, request))
 
 
@@ -180,8 +218,7 @@ def merge(uuids):
     """
     Merge a set of profiles given the list of uuids
     """
-    sh_db_cfg = "shdb.cfg"
-    db = sortinghat_db_conn(sh_db_cfg)
+    db = sortinghat_db_conn()
     if len(uuids) > 1:
         for uuid in uuids[:-1]:
             sortinghat.api.merge_unique_identities(db, uuid, uuids[-1])
@@ -206,11 +243,11 @@ def parse_shdb_config_file(filename):
     return shdb_user, shdb_pass, shdb_name, shdb_host
 
 
-def sortinghat_db_conn(filename):
+def sortinghat_db_conn():
     """
     Returns Sorting Hat database object to work with
     """
-    shdb_user, shdb_pass, shdb_name, shdb_host = parse_shdb_config_file(filename)
+    # shdb_user, shdb_pass, shdb_name, shdb_host = parse_shdb_config_file(filename)
     sortinghat_db = Database(user=shdb_user, password=shdb_pass, database=shdb_name, host=shdb_host)
 
     return sortinghat_db

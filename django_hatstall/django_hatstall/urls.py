@@ -23,6 +23,7 @@ urlpatterns = [
     url(r'^profiles/', include('identities.urls')),
     url(r'^organizations/', include('identities.orgs_urls')),
     url(r'^about/', include('identities.about_urls')),
+    url(r'^shdb/', include('identities.shdb_urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^accounts/login/$', auth_views.LoginView.as_view()),
     url('^', include('django.contrib.auth.urls'))
