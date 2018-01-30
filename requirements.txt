@@ -1,4 +1,4 @@
-Flask
+Django
 grimoire-elk
 grimoirelab-toolkit
 sortinghat
