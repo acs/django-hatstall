@@ -8,7 +8,7 @@ There are already existing solutions, like `Jonathan Corbet's gitdm`, the curren
 * `gitdm` is focused in git related information, and *community* members go beyond coding
 * current SortingHat solutions are not very *human friendly*, and the learning curve might be very high
 
-So, I started working on a *PoC (Proof of Concept)* of a web UI to manage these processes by the community manager. This is how **Hatstall** started.
+So, @jsmanrique started working on a *PoC (Proof of Concept)* of a web UI to manage these processes by the community manager. This is how **Hatstall** started.
 
 ![About page](img/intro.jpg)
 
@@ -16,7 +16,7 @@ So, I started working on a *PoC (Proof of Concept)* of a web UI to manage these 
 
 The technologies involved are:
 * For the backend:
-  * [Flask](http://flask.pocoo.org/) as main framework
+  * We moved from [Flask](http://flask.pocoo.org/) to [Django](https://www.djangoproject.com/) as main framework
   * [SortingHat](https://github.com/grimoirelab/sortinghat/) to access to community profiles data (basically using [SortingHat API](https://github.com/grimoirelab/sortinghat/blob/master/sortinghat/api.py))
 * For the front-end:
   * [Bootstrap](http://getbootstrap.com/) as main UI framework, and some extra plugins like [Bootstrap Datepicker](https://github.com/uxsolutions/bootstrap-datepicker/)
@@ -26,7 +26,7 @@ The technologies involved are:
 
 * Hatstall doesn't run any data update in the rest of [Grimoirelab](http://grimoirelab.github.io) infrastructure. Its aim is only to manage data in configured SortingHat database.
 * It works well with *small* databases (up to 5K indentities). From there, you might notice lags requesting data, because it doesn't implement any pagination on data requests. In some parts of the process, it requests all the identities in the database.
-* I consider myself a *Python newbie*, so don't expect high quality code here :wink:
+* This project is on its early days, so don't expect high quality code here, yet :wink:
 
 ## Understanding SortingHat database
 
