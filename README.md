@@ -1,6 +1,19 @@
 # Hatstall
 
-Hatstall is a web interface for [SortingHat](http://github.com/grimoirelab/sortinghat) databases developed mainly with [Flask](http://flask.pocoo.org/)
+Hatstall is a web interface for [SortingHat](http://github.com/grimoirelab/sortinghat) databases developed mainly with [Django](https://www.djangoproject.com/)
+
+## What does it try to solve?
+
+Dealing with contributors multi-identities in a development community is an issue in order to get the right metrics about their contributions in the whole project. For example:
+* they might be using several usernames in the same data source (i.e. different emails for git commits)
+* to get a whole view, you need to take into account their contribution in different data sources (git, issues, chats, etc.). You need to merge multiple usernames under a single unique identity
+* they might be working for several organizations during project life
+
+[SortingHat](http://github.com/grimoirelab/sortinghat) is the [GrimoireLab](https://grimoirelab.github.io) tool to deal with all that stuff, but it's CLI might not be very intuitive. So, the learning curve is high, and it takes a long time for a non-tech user to give the right  information to the right identity.
+
+So, Hatstall tries to make easier to deal with multi-identities management in development communities.
+
+## Why Hatstall as a name?
 
 According to [Harry Potter Wiki](http://harrypotter.wikia.com/wiki/Hatstall) **Hatstall** is defined as:
 
@@ -8,32 +21,23 @@ According to [Harry Potter Wiki](http://harrypotter.wikia.com/wiki/Hatstall) **H
 
 ## Installation
 
-Currently requirements are defined in the [requirements.txt](requirements.txt) file. They are mostly:
+Clone the repository and install, or check you already have, the requirements defined in the [requirements.txt](requirements.txt) file. They are mostly:
 
-* Flask
+* Django
 * grimoire-elk
 * grimoirelab-toolkit
 * sortinghat
 
 ## Usage
 
-Once you have the requirements installed (I recommend using a Python virtual environment), you would need a configuration file.
-
-You can change [the one provided](shdb.cfg) (the app uses it by default), or create your own one.
-
-The parameters in the file are:
-* `user` stands for your username for the SortingHat database
-* `password` stands for the password for your SortingHat database's user
-* `name` stands for the name of the SortingHat database you want to manage
-* `host` stands for the address where the SortingHat database is hosted
-
-Once you have it, you can launch the web app using the command line:
+Once you have the requirements installed (I recommend using a Python virtual environment) you can launch the web app using the command line:
 
 ```
-$  python3 app.py [-f <your configuration file>]
+django-hatstall/django_hatstall $ python3 manage.py migrate
+django-hatstall/django_hatstall $ python3 manage.py runserver
 ```
 
-There is more documentation is [docs/README.md](under development).
+There is more documentation in [docs/README.md](under development).
 
 # Contributing
 
