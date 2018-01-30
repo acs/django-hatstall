@@ -37,7 +37,7 @@ django-hatstall/django_hatstall $ python3 manage.py migrate
 django-hatstall/django_hatstall $ python3 manage.py runserver
 ```
 
-There is more documentation in [docs/README.md](under development).
+There is more documentation [under development](docs/README.md).
 
 # Contributing
 
@@ -53,4 +53,4 @@ Thre is more information in the [CONTRIBUTING](CONTRIBUTING.md) file
 
 ## Logo
 
-Logo is based in a combination of [Bitergia](http://bitergia.com)'s owl logo and [Wizard's white hat](https://openclipart.org/detail/245968/wizards-white-hat) from [Thewizardplusplus](https://openclipart.org/user-detail/thewizardplusplus)
+Logo is based in a combination of [Bitergia](http://bitergia.com)'s owl logo and [Wizard's white hat](https://openclipart.org/detail/245968/wizards-white-hat) from [Thewizardplusplus](https://openclipart.org/user-detail/thewizardplusplus), but we are working on a new one
