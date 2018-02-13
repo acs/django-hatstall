@@ -190,7 +190,12 @@ def get_shdb_params(request, err=None):
         shdb_pass = request.POST.get('shdb_pass_form')
         shdb_name = request.POST.get('shdb_name_form')
         shdb_host = request.POST.get('shdb_host_form')
-    if shdb_user and shdb_name and shdb_host:
+        try:
+            db = sortinghat_db_conn()
+        except sortinghat.exceptions.DatabaseError as error:
+            err = error
+
+    if shdb_user and shdb_name and shdb_host and not err:
         return redirect('/profiles/list')
     context = {
         "err": err
