@@ -34,10 +34,31 @@ def list(request):
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     if (not shdb_name) or (not shdb_name) or (not shdb_host):
         return redirect('/shdb/params')
-    # sh_db_cfg = "shdb.cfg"
+    if request.method == 'POST':
+        sh_db = sortinghat_db_conn()
+        err = None
+        try:
+            # Code from cmd/show of sortinghat
+            uidentities = sortinghat.api.search_unique_identities(sh_db, request.POST.get('shsearch'))
+            unique_identities = []
+            for uid in uidentities:
+                uid_dict = uid.to_dict()
+                # Add enrollments to a new property 'roles'
+                enrollments = sortinghat.api.enrollments(sh_db, uid.uuid)
+                uid.roles = enrollments
+                enrollments = []
+                for enrollment in uid.roles:
+                    enrollments.append(enrollment.organization.name)
+                uid_dict['enrollments'] = enrollments
+                unique_identities.append(uid_dict)
+        except sortinghat.exceptions.NotFoundError as error:
+            return HttpResponse(render_profiles(sh_db, request, error))
+        template = loader.get_template('profiles/profiles.html')
+        context = {
+            "uids": unique_identities, "err": err
+        }
+        return HttpResponse(template.render(context, request))
     sh_db = sortinghat_db_conn()
-    # uuids = render_profiles(sh_db, request)
-    # return HttpResponse("Listing all profiles: " + json.dumps(uuids))
     return HttpResponse(render_profiles(sh_db, request))
 
 
