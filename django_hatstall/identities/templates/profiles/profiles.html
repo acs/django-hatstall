@@ -14,9 +14,20 @@
 
 {% block body %}
 <h1>Profiles</h1>
+<form action="/profiles/list" method="POST">{% csrf_token %}
+  <div class="container">
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label" for="shsearch">Search to DataBase:</label>
+      <div class="col-sm-10">
+        <input class="form-control" id="shsearch" name="shsearch" minlength=3>
+      </div>
+    </div>
+  </div>
+</form>
 <form action="/profiles/" method="POST">{% csrf_token %}
 
     <table class="table table-striped" id="myTable">
+
         <thead class="thead-dark">
             <tr>
                 <th></th>
