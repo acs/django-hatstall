@@ -34,7 +34,8 @@ def list(request):
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     if (not shdb_name) or (not shdb_name) or (not shdb_host):
         return redirect('/shdb/params')
-    if request.method == 'POST':
+    # Search in the database
+    if request.method == 'POST' and request.POST.get('shsearch'):
         sh_db = sortinghat_db_conn()
         err = None
         try:
