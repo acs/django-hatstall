@@ -44,6 +44,7 @@ def list(request):
             unique_identities = []
             for uid in uidentities:
                 uid_dict = uid.to_dict()
+                uid_dict.update({"last_modified": uid.last_modified})
                 # Add enrollments to a new property 'roles'
                 enrollments = sortinghat.api.enrollments(sh_db, uid.uuid)
                 uid.roles = enrollments
