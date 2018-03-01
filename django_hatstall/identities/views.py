@@ -1,6 +1,7 @@
 import configparser
 from dateutil import parser
 
+import os
 import sortinghat.api
 
 from sortinghat.db.database import Database
@@ -17,10 +18,10 @@ from django.template import loader
 #
 
 # Global vars
-shdb_user = ""
-shdb_pass = ""
-shdb_name = ""
-shdb_host = ""
+shdb_user = os.getenv('SHDB_USER','')
+shdb_pass = os.getenv('SHDB_PASS','')
+shdb_name = os.getenv('SHDB_NAME','')
+shdb_host = os.getenv('SHDB_HOST','')
 
 
 def index(request):
