@@ -10,7 +10,7 @@ EXPOSE 8001
 LABEL \
   maintainer="Chaoss" \
   description="Hatstall is a web interface for SortingHat databases developed mainly with Django" \
-  project="https://github.com/acs/django-hatstall" \
+  project="https://github.com/chaoss/grimoirelab-hatstall.git" \
   version="$HATSTALL_VERSION"
 
 RUN \
