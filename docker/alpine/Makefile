@@ -1,5 +1,5 @@
 VERSION= $(shell grep '_version_' ../../_version.py  | awk -F '"' '{print $$2}') 
-IMAGE='olblak/hatstall'
+IMAGE='grimoirelab/hatstall'
 
 build:
 	docker build -t $(IMAGE):$(VERSION) -f Dockerfile ../..
