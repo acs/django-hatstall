@@ -1,4 +1,5 @@
 import configparser
+import math
 from dateutil import parser
 
 import sortinghat.api
@@ -263,19 +264,37 @@ def render_profiles(db, request, err=None):
     Render profiles page
     """
     unique_identities = []
-    with db.connect() as session:
-        for u_identity in session.query(UniqueIdentity):
-            uuid_dict = u_identity.to_dict()
-            uuid_dict.update({"last_modified": u_identity.last_modified})
+    sh_db = sortinghat_db_conn()
+    err = None
+    if request.method == 'POST':
+        current_page = int(request.POST.get('page'))
+        table_length = 10
+    else:
+        current_page = 1
+        table_length = 10
+
+    offset = 0 + (10 * (current_page - 1))
+    try:
+        # Code from api of sortinghat
+        uidentities, uicount = sortinghat.api.search_unique_identities_slice(sh_db, None, offset, table_length)
+        n_pages = math.ceil(uicount / 10)
+        unique_identities = []
+        for uid in uidentities:
+            uid_dict = uid.to_dict()
+            # Add enrollments to a new property 'roles'
+            enrollments = sortinghat.api.enrollments(sh_db, uid.uuid)
+            uid.roles = enrollments
             enrollments = []
-            for enrollment in u_identity.enrollments:
+            for enrollment in uid.roles:
                 enrollments.append(enrollment.organization.name)
-            uuid_dict['enrollments'] = enrollments
-            unique_identities.append(uuid_dict)
-    session.expunge_all()
+            uid_dict['enrollments'] = enrollments
+            unique_identities.append(uid_dict)
+    except sortinghat.exceptions.NotFoundError as error:
+        pass
+        # return HttpResponse(render_profiles(sh_db, request, error))
     template = loader.get_template('profiles/profiles.html')
     context = {
-        "uids": unique_identities, "err": err
+        "uids": unique_identities, "n_pages": n_pages, "current_page": current_page, "err": err
     }
     return template.render(context, request)
     # return unique_identities
