@@ -22,6 +22,7 @@ shdb_user = ""
 shdb_pass = ""
 shdb_name = ""
 shdb_host = ""
+shsearch = ""
 
 
 def index(request):
@@ -263,20 +264,26 @@ def render_profiles(db, request, err=None):
     """
     Render profiles page
     """
+    global shsearch
     unique_identities = []
     sh_db = sortinghat_db_conn()
     err = None
     if request.method == 'POST':
-        current_page = int(request.POST.get('page'))
+        if "shsearch" in request.POST:
+            shsearch = request.POST.get('shsearch')
+            current_page = 1
+        else:
+            current_page = int(request.POST.get('page'))
         table_length = 10
     else:
+        shsearch = ""
         current_page = 1
         table_length = 10
 
     offset = 0 + (10 * (current_page - 1))
     try:
         # Code from api of sortinghat
-        uidentities, uicount = sortinghat.api.search_unique_identities_slice(sh_db, None, offset, table_length)
+        uidentities, uicount = sortinghat.api.search_unique_identities_slice(sh_db, shsearch, offset, table_length)
         n_pages = math.ceil(uicount / 10)
         unique_identities = []
         for uid in uidentities:
@@ -290,11 +297,10 @@ def render_profiles(db, request, err=None):
             uid_dict['enrollments'] = enrollments
             unique_identities.append(uid_dict)
     except sortinghat.exceptions.NotFoundError as error:
-        pass
-        # return HttpResponse(render_profiles(sh_db, request, error))
+        err = error
     template = loader.get_template('profiles/profiles.html')
     context = {
-        "uids": unique_identities, "n_pages": n_pages, "current_page": current_page, "err": err
+        "uids": unique_identities, "n_pages": n_pages, "current_page": current_page, "shsearch": shsearch, "err": err
     }
     return template.render(context, request)
     # return unique_identities
