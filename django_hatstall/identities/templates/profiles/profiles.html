@@ -26,6 +26,8 @@
             pagingControls += ' ';
             $("#customPagination").html(pagingControls);
             $("#myTable_paginate").attr('hidden','');
+            $("#myTable_length").attr('hidden','');
+            $("#myTable_filter").attr('hidden','');
 
         });
     </script>
@@ -33,6 +35,11 @@
 
 {% block body %}
 <h1>Profiles</h1>
+<div style="float:right; margin-bottom:4px;">
+    <form action="/profiles/list" method="POST">{% csrf_token %}
+        Search to SH: <input id="shsearch" name="shsearch" value="{{shsearch}}" minlength=3>
+    </form>
+</div>
 <form action="/profiles/" method="POST">{% csrf_token %}
 
     <table class="table table-striped" id="myTable">
