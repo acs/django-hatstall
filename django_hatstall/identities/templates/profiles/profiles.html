@@ -48,13 +48,13 @@
 <div style="float:left; margin-bottom:4px;">
     <form action="/profiles/list" method="POST">{% csrf_token %}
         Show
-        <select id="tableLength" name="table_length" value="{{table_length}}">
+        <select id="tableLength" name="table_length" value="{{table_length}}" onchange="this.form.submit()">
           <option value="10">10</option>
           <option value="25">25</option>
           <option value="50">50</option>
           <option value="100">100</option>
         </select>
-        <button type="submit" class="btn btn-info">View</button>
+        entries
     </form>
 </div>
 <form action="/profiles/" method="POST">{% csrf_token %}
