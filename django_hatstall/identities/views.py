@@ -18,11 +18,13 @@ from django.template import loader
 #
 
 # Global vars
+current_page = 1
 shdb_user = ""
 shdb_pass = ""
 shdb_name = ""
 shdb_host = ""
 shsearch = ""
+table_length = 10
 
 
 def index(request):
@@ -266,6 +268,8 @@ def render_profiles(db, request, err=None):
     Render profiles page
     """
     global shsearch
+    global table_length
+    global current_page
     unique_identities = []
     sh_db = sortinghat_db_conn()
     err = None
@@ -273,19 +277,21 @@ def render_profiles(db, request, err=None):
         if "shsearch" in request.POST:
             shsearch = request.POST.get('shsearch')
             current_page = 1
-        else:
+        elif "page" in request.POST:
             current_page = int(request.POST.get('page'))
-        table_length = 10
+        elif "table_length" in request.POST:
+            table_length = int(request.POST.get('table_length'))
+            current_page = 1
     else:
         shsearch = ""
         current_page = 1
         table_length = 10
 
-    offset = 0 + (10 * (current_page - 1))
+    offset = 0 + (table_length * (current_page - 1))
     try:
         # Code from api of sortinghat
         uidentities, uicount = sortinghat.api.search_unique_identities_slice(sh_db, shsearch, offset, table_length)
-        n_pages = math.ceil(uicount / 10)
+        n_pages = math.ceil(uicount / table_length)
         unique_identities = []
         for uid in uidentities:
             uid_dict = uid.to_dict()
@@ -301,7 +307,8 @@ def render_profiles(db, request, err=None):
         err = error
     template = loader.get_template('profiles/profiles.html')
     context = {
-        "uids": unique_identities, "n_pages": n_pages, "current_page": current_page, "shsearch": shsearch, "err": err
+        "uids": unique_identities, "n_pages": n_pages, "current_page": current_page,
+        "shsearch": shsearch, "table_length": table_length, "err": err
     }
     return template.render(context, request)
     # return unique_identities

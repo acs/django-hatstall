@@ -7,7 +7,10 @@
     {{ block.super }}
     <script type="text/javascript">
         $(document).ready(function(){
-            $('#myTable').DataTable();
+            $('#myTable').DataTable({
+                "lengthChange": false,
+                "paging": false
+            });
 
             var nPages = {{ n_pages }};
             var currentPage = {{ current_page}};
@@ -25,9 +28,10 @@
             }
             pagingControls += ' ';
             $("#customPagination").html(pagingControls);
-            $("#myTable_paginate").attr('hidden','');
-            $("#myTable_length").attr('hidden','');
+            // Hide default search input
             $("#myTable_filter").attr('hidden','');
+            // Selection of the table length
+            $('#tableLength option[value="{{table_length}}"]').attr("selected",true);
 
         });
     </script>
@@ -38,6 +42,19 @@
 <div style="float:right; margin-bottom:4px;">
     <form action="/profiles/list" method="POST">{% csrf_token %}
         Search to SH: <input id="shsearch" name="shsearch" value="{{shsearch}}" minlength=3>
+    </form>
+</div>
+
+<div style="float:left; margin-bottom:4px;">
+    <form action="/profiles/list" method="POST">{% csrf_token %}
+        Show
+        <select id="tableLength" name="table_length" value="{{table_length}}">
+          <option value="10">10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+        <button type="submit" class="btn btn-info">View</button>
     </form>
 </div>
 <form action="/profiles/" method="POST">{% csrf_token %}
