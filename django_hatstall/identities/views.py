@@ -19,12 +19,15 @@ from django.template import loader
 
 # Global vars
 current_page = 1
+current_page_profile = 1
 shdb_user = ""
 shdb_pass = ""
 shdb_name = ""
 shdb_host = ""
 shsearch = ""
+shsearch_profile = ""
 table_length = 10
+table_length_profile = 1
 
 
 def index(request):
@@ -52,7 +55,8 @@ def identity(request, identity_id):
     if (not shdb_name) or (not shdb_name) or (not shdb_host):
         return redirect('/shdb/params')
     sh_db = sortinghat_db_conn()
-    if request.method == 'POST':
+    if request.method == 'POST' and "shsearch" not in request.POST and "table_length" not in request.POST\
+            and "page" not in request.POST:
         err = update_profile(sh_db, identity_id, request.POST)
     return HttpResponse(render_profile(sh_db, identity_id, request, err))
 
@@ -323,6 +327,9 @@ def render_profile(db, profile_uuid, request, err=None):
     It shows also sections to add enrollments and merge remaining
     identities
     """
+    global shsearch_profile
+    global table_length_profile
+    global current_page_profile
     orgs = sortinghat.api.registry(db)
     remaining_identities = []
     profile_enrollments = []
@@ -330,15 +337,56 @@ def render_profile(db, profile_uuid, request, err=None):
         profile_info = session.query(UniqueIdentity). \
             filter(UniqueIdentity.uuid == profile_uuid).first()
         profile_identities = [x.id for x in profile_info.identities]
-        for identity in session.query(Identity).filter(Identity.id.notin_(profile_identities)):
+        '''for identity in session.query(Identity).filter(Identity.id.notin_(profile_identities)):
             remaining_identities.append(identity)
+        '''
         for enrollment in profile_info.enrollments:
             profile_enrollments.append(enrollment)
         countries = sortinghat.api.countries(db)
         session.expunge_all()
+
+    err = None
+    if request.method == 'POST':
+        if "shsearch" in request.POST:
+            shsearch_profile = request.POST.get('shsearch')
+            current_page_profile = 1
+        elif "page" in request.POST:
+            current_page_profile = int(request.POST.get('page'))
+        elif "table_length" in request.POST:
+            table_length_profile = int(request.POST.get('table_length'))
+            current_page_profile = 1
+        show_table = True
+    else:
+        shsearch_profile = ""
+        current_page_profile = 1
+        table_length_profile = 10
+        show_table = ""
+
+    unique_identities = []
+    n_pages = 1
+    if show_table:
+        offset = 0 + (table_length_profile * (current_page_profile - 1))
+        try:
+            # Code from api of sortinghat
+            uidentities, uicount = sortinghat.api.search_unique_identities_slice(db, shsearch_profile, offset, table_length_profile)
+            n_pages = math.ceil(uicount / table_length_profile)
+            for uid in uidentities:
+                uid_dict = uid.to_dict()
+                uid_dict.update({"last_modified": uid.last_modified})
+                # Add enrollments to a new property 'roles'
+                enrollments = sortinghat.api.enrollments(db, uid.uuid)
+                uid.roles = enrollments
+                enrollments = []
+                for enrollment in uid.roles:
+                    enrollments.append(enrollment.organization.name)
+                uid_dict['enrollments'] = enrollments
+                unique_identities.append(uid_dict)
+        except sortinghat.exceptions.NotFoundError as error:
+            err = error
     context = {
-        "profile": profile_info.to_dict(), "orgs": orgs, "identities": remaining_identities,
-        "enrollments": profile_info.enrollments, "countries": countries, "err": err
+        "profile": profile_info.to_dict(), "orgs": orgs, "unique_identities": unique_identities, "n_pages": n_pages,
+        "current_page": current_page_profile, "shsearch": shsearch_profile, "table_length": table_length_profile,
+        "show_table": show_table, "enrollments": profile_info.enrollments, "countries": countries, "err": err
     }
     template = loader.get_template('profiles/profile.html')
     return template.render(context, request)
