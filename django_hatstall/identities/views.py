@@ -341,7 +341,8 @@ def render_profile(db, profile_uuid, request, err=None):
         countries = sortinghat.api.countries(db)
         session.expunge_all()
 
-    if request.method == 'POST':
+    if request.method == 'POST' and "name" not in request.POST and "email" not in request.POST\
+            and "bot" not in request.POST and "country" not in request.POST:
         if "shsearch" in request.POST:
             shsearch_profile = request.POST.get('shsearch')
             current_page_profile = 1
@@ -405,5 +406,5 @@ def update_profile(db, uuid, profile_data):
     except sortinghat.exceptions.WrappedValueError as error:
         err = error
     except MultiValueDictKeyError as error:
-        err = error
+        err = "The {} can not be empty. Select one.".format(error.args[0])
     return err
