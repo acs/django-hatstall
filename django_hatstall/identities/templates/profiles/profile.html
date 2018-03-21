@@ -260,10 +260,12 @@
                             <tbody>
                                 {% for identity in unique_identities %}
                                 <tr>
-                                    <td><input type="checkbox" name="uuid" value="{{identity.profile.uuid}}"></td>
-                                    <td>{{identity.profile.name}}</td>
-                                    <td>{{identity.profile.email}}</td>
-                                    <td><a href="javascript:showUniqueIdentity('{{identity.uuid}}');">view</a></td>
+                                    {% if identity.profile.uuid != profile.profile.uuid %}
+                                        <td><input type="checkbox" name="uuid" value="{{identity.profile.uuid}}"></td>
+                                        <td>{{identity.profile.name}}</td>
+                                        <td>{{identity.profile.email}}</td>
+                                        <td><a href="javascript:showUniqueIdentity('{{identity.uuid}}');">view</a></td>
+                                    {% endif %}
                                 </tr>
                                 {% endfor %}
                             </tbody>
