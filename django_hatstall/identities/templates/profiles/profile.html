@@ -20,10 +20,14 @@
 
             $('#addEnrollmentsBtn').click(function(){
                 $('#organizations').removeAttr('hidden');
+                $('#identities').attr('hidden','');
+                $('#uniqueIdentitiesCards').attr('hidden','');
             });
 
             $('#addIdentitiesBtn').click(function(){
                 $('#identities').removeAttr('hidden');
+                $('#uniqueIdentitiesCards').removeAttr('hidden');
+                $('#organizations').attr('hidden','');
             });
 
             $('#closeOrganizations').click(function(){
@@ -77,18 +81,22 @@
             $('#tableLength option[value="{{table_length}}"]').attr("selected",true);
 
             $( "#shsearch" ).submit(function( event ) {
-              $('#uniqueIndentitesTable').removeAttr('hidden');
+              $('#uniqueIdentitiesTable').removeAttr('hidden');
               event.preventDefault();
             });
 
             if("{{show_table}}"){
                 $('#identities').removeAttr('hidden');
-                $('#uniqueIndentitesTable').removeAttr('hidden');
+                $('#uniqueIdentitiesTable').removeAttr('hidden');
             }
         });
 
         // Functions based on JS events
         var showUniqueIdentity = function(uuid){
+            var cards = $('#uniqueIdentitiesCards>div')
+            for (var i = 0; i < cards.length; i++) {
+                $('#uniqueIdentitiesCards>div')[i].hidden = true;
+            }
             $('#'+ uuid).removeAttr('hidden');
         }
         var closeUniqueIdentity = function(uuid){
@@ -218,7 +226,7 @@
                     </form>
                 </div>
                 <br><br>
-                <div id="uniqueIndentitesTable" hidden>
+                <div id="uniqueIdentitiesTable" hidden>
                     <div style="float:left; margin-bottom:4px;">
                         <form method="POST">{% csrf_token %}
                             Show
@@ -289,7 +297,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-4" id="uniqueIdentitiesCards">
         {% for uuid in unique_identities %}
             <div class="card" id="{{uuid.uuid}}" hidden>
               <div class="card-body">
