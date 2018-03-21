@@ -85,8 +85,15 @@
                 $('#identities').removeAttr('hidden');
                 $('#uniqueIndentitesTable').removeAttr('hidden');
             }
-
         });
+
+        // Functions based on JS events
+        var showUniqueIdentity = function(uuid){
+            $('#'+ uuid).removeAttr('hidden');
+        }
+        var closeUniqueIdentity = function(uuid){
+            $('#'+ uuid).attr('hidden','');
+        }
     </script>
 {% endblock %}
 
@@ -248,7 +255,7 @@
                                     <td><input type="checkbox" name="uuid" value="{{identity.profile.uuid}}"></td>
                                     <td>{{identity.profile.name}}</td>
                                     <td>{{identity.profile.email}}</td>
-                                    <td><a href="/profiles/{{identity.uuid}}">view</a></td>
+                                    <td><a href="javascript:showUniqueIdentity('{{identity.uuid}}');">view</a></td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -283,46 +290,26 @@
         </div>
     </div>
     <div class="col-md-4">
-
-        <!--div id="identities" hidden class="row">
-            <div class="col-lg-12">
-                <h2 class="float-left">Identities</h2>
-                <button id="closeIdentities" type="button" class="close" aria-label="Close">
+        {% for uuid in unique_identities %}
+            <div class="card" id="{{uuid.uuid}}" hidden>
+              <div class="card-body">
+                <button id="close_{{uuid.uuid}}" type="button" class="close" aria-label="Close" onclick="closeUniqueIdentity('{{uuid.uuid}}')">
                     <span aria-hidden="true">&times;</span>
-                  </button>
-                <form action="/profiles/{{profile.profile.uuid}}/merge" method="POST">{% csrf_token %}
-                    <table class="table table-striped" id="identitiesTable">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th></th>
-                                <th>Name</th>
-                                <th>email</th>
-                                <th>Username</th>
-                                <th>Source</th>
-                                <th>uuids.</th>
-                            </tr>
-                        </thead>
-                        <tfoot>
-                            <tr>
-                                <td colspan="6"><input type="submit" value="Merge" class="btn btn-success"></td>
-                            </tr>
-                        </tfoot>
-                        <tbody>
-                            {% for identity in identities %}
-                            <tr>
-                                <td><input type="checkbox" name="uuid" value="{{identity.uuid}}"></td>
-                                <td>{{identity.name}}</td>
-                                <td>{{identity.email}}</td>
-                                <td>{{identity.username}}</td>
-                                <td>{{identity.source}}</td>
-                                <td><a href="/profiles/{{identity.uuid}}">view</a></td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </form>
+                </button>
+                <h4 class="card-title">{{uuid.profile.name}}</h4>
+                  <p class="card-text"><b>Email:</b> {{uuid.profile.email}}</p>
+                  <p class="card-text"><b>Bot:</b> {{uuid.profile.is_bot}}</p>
+                  <p class="card-text"><b>Country:</b> {{uuid.profile.country.name}}</p>
+                  <p class="card-text"><b>Last Mod.:</b> {{uuid.last_modified}}</p>
+                Identities:
+                <ul class="list-group">
+                    {% for identity in uuid.identities %}
+                        <li class="list-group-item">{{identity.name}} - {{identity.email}} - {{identity.username}} - {{identity.source}}</li>
+                    {% endfor %}
+                </ul>
+              </div>
             </div>
-        </div-->
+        {% endfor %}
     </div>
 </div>
 {% endblock %}
