@@ -305,6 +305,9 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <h4 class="card-title">{{uuid.profile.name}}</h4>
+                  <form action="/profiles/{{profile.profile.uuid}}/merge" method="POST">{% csrf_token %}
+                    <button type="submit" name="uuid" value="{{uuid.profile.uuid}}" class="btn btn-success" style="float: right;">Merge</button>
+                  </form>
                   <p class="card-text"><b>Email:</b> {{uuid.profile.email}}</p>
                   <p class="card-text"><b>Bot:</b> {{uuid.profile.is_bot}}</p>
                   <p class="card-text"><b>Country:</b> {{uuid.profile.country.name}}</p>
