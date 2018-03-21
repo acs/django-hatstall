@@ -12,6 +12,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.template import loader
+from django.utils.datastructures import MultiValueDictKeyError
 
 #
 # VIEWS
@@ -331,21 +332,15 @@ def render_profile(db, profile_uuid, request, err=None):
     global table_length_profile
     global current_page_profile
     orgs = sortinghat.api.registry(db)
-    remaining_identities = []
     profile_enrollments = []
     with db.connect() as session:
         profile_info = session.query(UniqueIdentity). \
             filter(UniqueIdentity.uuid == profile_uuid).first()
-        profile_identities = [x.id for x in profile_info.identities]
-        '''for identity in session.query(Identity).filter(Identity.id.notin_(profile_identities)):
-            remaining_identities.append(identity)
-        '''
         for enrollment in profile_info.enrollments:
             profile_enrollments.append(enrollment)
         countries = sortinghat.api.countries(db)
         session.expunge_all()
 
-    err = None
     if request.method == 'POST':
         if "shsearch" in request.POST:
             shsearch_profile = request.POST.get('shsearch')
@@ -408,5 +403,7 @@ def update_profile(db, uuid, profile_data):
     except sortinghat.exceptions.NotFoundError as error:
         err = error
     except sortinghat.exceptions.WrappedValueError as error:
+        err = error
+    except MultiValueDictKeyError as error:
         err = error
     return err
