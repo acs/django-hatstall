@@ -1,5 +1,7 @@
 import configparser
 import math
+import os
+
 from dateutil import parser
 
 import sortinghat.api
@@ -21,14 +23,77 @@ from django.utils.datastructures import MultiValueDictKeyError
 # Global vars
 current_page = 1
 current_page_profile = 1
-shdb_user = ""
-shdb_pass = ""
-shdb_name = ""
-shdb_host = ""
 shsearch = ""
 shsearch_profile = ""
 table_length = 10
 table_length_profile = 1
+
+
+class Conf():
+    """
+    Conf class to manage the configuration of Hatstall.
+    Check if it can be included in Django app settings.
+    Right now it just includes the config for accessing the SortingHat database.
+    """
+
+    shdb_user = None
+    shdb_pass = None
+    shdb_name = None
+    shdb_host = None
+    sh_db_cfg = "shdb.cfg"  # Default config file
+
+    @staticmethod
+    def post_config(request):
+        """
+        Configure Hatstall from the data included in a web form
+
+        :param request: HTTP request with the config params
+        :return: None
+        """
+
+        Conf.shdb_user = request.POST.get('shdb_user_form')
+        Conf.shdb_pass = request.POST.get('shdb_pass_form')
+        Conf.shdb_name = request.POST.get('shdb_name_form')
+        Conf.shdb_host = request.POST.get('shdb_host_form')
+
+    @staticmethod
+    def parse_shdb_config_file():
+        """
+        Returns SortingHat database settings (user, password, name, host) to
+        connect to it later
+        """
+
+        # Check if the file exists
+        if not os.path.exists(Conf.sh_db_cfg):
+            print("Config file not found", Conf.sh_db_cfg)
+            return
+
+        try:
+            shdb_config = configparser.ConfigParser()
+            shdb_config.read(Conf.sh_db_cfg)
+            Conf.shdb_user = shdb_config.get('SHDB_Settings', 'user')
+            Conf.shdb_pass = shdb_config.get('SHDB_Settings', 'password')
+            Conf.shdb_name = shdb_config.get('SHDB_Settings', 'name')
+            Conf.shdb_host = shdb_config.get('SHDB_Settings', 'host')
+        except (configparser.NoSectionError, configparser.NoOptionError) as ex:
+            print("Invalid config file", ex)
+
+    @staticmethod
+    def check_conf():
+        """
+        Check if Hatstall is already configured
+        :return: True if config is done, False in other case
+        """
+
+        configured = True
+
+        # First try to load always the config from the config file
+        Conf.parse_shdb_config_file()
+
+        if None in [Conf.shdb_user, Conf.shdb_name, Conf.shdb_host, Conf.shdb_pass]:
+            configured = False
+
+        return configured
 
 
 def index(request):
@@ -40,7 +105,7 @@ def index(request):
 def list(request):
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
-    if (not shdb_name) or (not shdb_name) or (not shdb_host):
+    if not Conf.check_conf():
         return redirect('/shdb/params')
     # sh_db_cfg = "shdb.cfg"
     sh_db = sortinghat_db_conn()
@@ -53,7 +118,7 @@ def identity(request, identity_id):
     err = None
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
-    if (not shdb_name) or (not shdb_name) or (not shdb_host):
+    if not Conf.check_conf():
         return redirect('/shdb/params')
     sh_db = sortinghat_db_conn()
     if request.method == 'POST' and "shsearch" not in request.POST and "table_length" not in request.POST\
@@ -71,7 +136,7 @@ def update_enrollment(request, identity_id, organization):
     err = None
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
-    if (not shdb_name) or (not shdb_name) or (not shdb_host):
+    if not Conf.check_conf():
         return redirect('/shdb/params')
     if request.method != 'POST':
         return redirect('profiles/list')
@@ -92,7 +157,7 @@ def unenroll_profile(request, identity_id, organization_info):
     err = None
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
-    if (not shdb_name) or (not shdb_name) or (not shdb_host):
+    if not Conf.check_conf():
         return redirect('/shdb/params')
     if request.method == 'POST':
         return redirect('/profiles/' + identity_id)
@@ -111,7 +176,7 @@ def enroll_to_profile(request, identity_id, organization):
     err = None
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
-    if (not shdb_name) or (not shdb_name) or (not shdb_host):
+    if not Conf.check_conf():
         return redirect('/shdb/params')
     if request.method == 'POST':
         return redirect('/profiles/' + identity_id)
@@ -131,7 +196,7 @@ def merge_to_profile(request, identity_id):
     err = None
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
-    if (not shdb_name) or (not shdb_name) or (not shdb_host):
+    if not Conf.check_conf():
         return redirect('/shdb/params')
     if request.method != 'POST':
         return redirect('/profiles/' + identity_id)
@@ -148,7 +213,7 @@ def unmerge(request, profile_uuid, identity_id):
     err = None
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
-    if (not shdb_name) or (not shdb_name) or (not shdb_host):
+    if not Conf.check_conf():
         return redirect('/shdb/params')
     if request.method != 'GET':
         return redirect('/profiles/' + profile_uuid)
@@ -170,7 +235,7 @@ def organizations(request):
     err = None
     if not request.user.is_authenticated:
         return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
-    if (not shdb_name) or (not shdb_name) or (not shdb_host):
+    if not Conf.check_conf():
         return redirect('/shdb/params')
     db = sortinghat_db_conn()
     if request.method == 'POST':
@@ -188,28 +253,26 @@ def organizations(request):
 
 def get_shdb_params(request, err=None):
     """
-    Render organizations page
+    Get the params to configure the connections to SortingHat database
     """
-    global shdb_user
-    global shdb_pass
-    global shdb_name
-    global shdb_host
+
     if request.method == 'POST':
-        shdb_user = request.POST.get('shdb_user_form')
-        shdb_pass = request.POST.get('shdb_pass_form')
-        shdb_name = request.POST.get('shdb_name_form')
-        shdb_host = request.POST.get('shdb_host_form')
+        Conf.post_config(request)
+
         try:
             db = sortinghat_db_conn()
         except sortinghat.exceptions.DatabaseError as error:
             err = error
 
-    if shdb_user and shdb_name and shdb_host and not err:
+    if Conf.check_conf() and not err:
         return redirect('/profiles/list')
+
     context = {
         "err": err
     }
+
     template = loader.get_template('shdb/shdb_form.html')
+
     return HttpResponse(template.render(context, request))
 
 
@@ -243,27 +306,12 @@ def merge(uuids):
     return err
 
 
-def parse_shdb_config_file(filename):
-    """
-    Returns SortingHat database settings (user, password, name, host) to
-    connect to it later
-    """
-    shdb_config = configparser.ConfigParser()
-    shdb_config.read(filename)
-    shdb_user = shdb_config.get('SHDB_Settings', 'user')
-    shdb_pass = shdb_config.get('SHDB_Settings', 'password')
-    shdb_name = shdb_config.get('SHDB_Settings', 'name')
-    shdb_host = shdb_config.get('SHDB_Settings', 'host')
-
-    return shdb_user, shdb_pass, shdb_name, shdb_host
-
-
 def sortinghat_db_conn():
     """
     Returns Sorting Hat database object to work with
     """
     # shdb_user, shdb_pass, shdb_name, shdb_host = parse_shdb_config_file(filename)
-    sortinghat_db = Database(user=shdb_user, password=shdb_pass, database=shdb_name, host=shdb_host)
+    sortinghat_db = Database(user=Conf.shdb_user, password=Conf.shdb_pass, database=Conf.shdb_name, host=Conf.shdb_host)
 
     return sortinghat_db
 
