@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% with active_page="about" %}
+
+{% block title %}Shdb params{% endblock %}
+
+{% block head %}
+    {{ block.super }}
+{% endblock %}
+
+{% block body %}
+<div class="container">
+  <h1> Parameters of the SortingHat database: </h1>
+  <br>
+  <form method="POST" action="">{% csrf_token %}
+    <div class="form-group">
+      <label for="shdb_user_form">User</label>
+      <input name="shdb_user_form"  class="form-control" id="shdb_user_form" placeholder="Username" required>
+    </div>
+    <div class="form-group">
+      <label for="shdb_pass_form">Password</label>
+      <input name="shdb_pass_form" type="password" class="form-control" id="shdb_pass_form" placeholder="Password">
+    </div>
+    <div class="form-group">
+      <label for="shdb_name_form">Name</label>
+      <input name="shdb_name_form" class="form-control" id="shdb_name_form" placeholder="Name of the sh database" required>
+    </div>
+    <div class="form-group">
+      <label for="shdb_host_form">Host</label>
+      <input name="shdb_host_form" class="form-control" id="shdb_host_form" placeholder="Host of the sh database" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Connect</button>
+  </form>
+</div>
+{% endblock %}
+{% endwith  %}
