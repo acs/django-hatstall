@@ -2,8 +2,8 @@
 
 echo "Running Hatstall"
 
-git clone https://github.com/acs/django-hatstall.git
-cd django-hatstall/django_hatstall
+git clone https://github.com/chaoss/grimoirelab-hatstall.git
+cd grimoirelab-hatstall/django-hatstall
 
 # Create the data models
 python3 manage.py makemigrations
