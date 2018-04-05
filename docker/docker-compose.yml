@@ -4,3 +4,5 @@ hatstall:
         - 8000:8000
   # volumes:
   #  - ./stage:/home/grimoirelab/stage
+  #  - ./shdb.cfg:/home/grimoirelab/shdb.cfg
+
