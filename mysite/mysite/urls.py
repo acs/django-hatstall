@@ -15,13 +15,13 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.contrib.auth import views as auth_views
-from django.urls import path
-from django.conf.urls import include, url
+from django.urls import path, re_path
+from django.conf.urls import include
+from django.views.generic import RedirectView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('hatstall/', include('hatstall.urls')),
-    url(r'^accounts/login/$', auth_views.LoginView.as_view()),
-    url('^', include('django.contrib.auth.urls'))
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('', RedirectView.as_view(url='/hatstall'))
 ]

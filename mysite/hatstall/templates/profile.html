@@ -153,7 +153,7 @@
                     </thead>
                     <tbody>
                         {% for enrollment in enrollments %}
-                        <form action="/profiles/{{profile.profile.uuid}}/update_enrollment/{{enrollment.organization.name}}" method="POST">{% csrf_token %}
+                        <form action="/hatstall/{{profile.profile.uuid}}/update_enrollment/{{enrollment.organization.name}}" method="POST">{% csrf_token %}
                             <tr>
                                 <td>{{enrollment.organization.name}}</td>
                                 <td>
@@ -169,7 +169,7 @@
                                     <button type="submit" class="btn btn-sm btn-success">Update</button>
                                 </td>
                                 <td>
-                                    <a href="/profiles/{{profile.profile.uuid}}/unenroll_from/{{enrollment.organization.name}}_{{enrollment.start|date:'Y-m-d H:i:s'}}_{{enrollment.end|date:'Y-m-d H:i:s'}}">un-enroll</a>
+                                    <a href="/hatstall/{{profile.profile.uuid}}/unenroll_from/{{enrollment.organization.name}}_{{enrollment.start|date:'Y-m-d H:i:s'}}_{{enrollment.end|date:'Y-m-d H:i:s'}}">un-enroll</a>
                                 </td>
                             </tr>
                         </form>
@@ -196,7 +196,7 @@
                                 <td>{{identity.name}} - {{identity.email}} - {{identity.username}} - {{identity.source}}</td>
                                 <td>
                                     {% if profile.profile.uuid != identity.id %}
-                                    <a href="/profiles/{{profile.profile.uuid}}/unmerge/{{identity.id}}">unmerge</a>
+                                    <a href="/hatstall/{{profile.profile.uuid}}/unmerge/{{identity.id}}">unmerge</a>
                                     {% endif %}
                                 </td>
                             </tr>
@@ -236,7 +236,7 @@
                             entries
                         </form>
                     </div>
-                    <form action="/profiles/{{profile.profile.uuid}}/merge" method="POST">{% csrf_token %}
+                    <form action="/hatstall/{{profile.profile.uuid}}/merge" method="POST">{% csrf_token %}
                         <table class="table table-striped" id="identitiesSearchTable">
                             <thead class="thead-dark">
                                 <tr>
@@ -288,7 +288,7 @@
                         {% for org in orgs %}
                         <tr>
                             <td>{{org.name}}</td>
-                            <td><a href="/profiles/{{profile.profile.uuid}}/enroll_in/{{org.name}}">enroll</a></td>
+                            <td><a href="/hatstall/{{profile.profile.uuid}}/enroll_in/{{org.name}}">enroll</a></td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -304,7 +304,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <h4 class="card-title">{{uuid.profile.name}}</h4>
-                  <form action="/profiles/{{profile.profile.uuid}}/merge" method="POST">{% csrf_token %}
+                  <form action="/hatstall/{{profile.profile.uuid}}/merge" method="POST">{% csrf_token %}
                     <button type="submit" name="uuid" value="{{uuid.profile.uuid}}" class="btn btn-success" style="float: right;">Merge</button>
                   </form>
                   <p class="card-text"><b>Email:</b> {{uuid.profile.email}}</p>
