@@ -12,12 +12,12 @@ before_install:
   - pip install python-dateutil
   - pip install pandas==0.18.1
   - pip install sortinghat
-  - cd django_hatstall && python manage.py makemigrations && cd ..
-  - cd django_hatstall && python manage.py migrate && cd ..
+  - cd django-hatstall && python manage.py makemigrations && cd ..
+  - cd django-hatstall && python manage.py migrate && cd ..
 
 # install:
 #   - ./setup.py install
 
 script:
-  - flake8 django_hatstall
-  - cd django_hatstall && python manage.py test && cd ..
+  - flake8 django-hatstall
+  - cd django-hatstall && python manage.py test && cd ..

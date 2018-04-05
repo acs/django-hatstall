@@ -10,7 +10,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 setup(
     name='django-hatstall',
     version='0.1',
-    packages = ['hatstall'],
+    packages=['hatstall'],
     include_package_data=True,
     license='GPLv3',
     description='A Django app to manage identities in Sorting Hat.',
