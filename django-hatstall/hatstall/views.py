@@ -3,6 +3,7 @@ import math
 import os
 
 from dateutil import parser
+from django.contrib.auth.decorators import login_required
 
 import sortinghat.api
 
@@ -10,7 +11,6 @@ from sortinghat.db.database import Database
 from sortinghat.db.model import UniqueIdentity
 from sortinghat.db.model import Identity
 
-from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.template import loader
@@ -97,29 +97,22 @@ class Conf():
 
 
 def index(request):
-    if request.method == 'POST':
-        err = merge(request.POST.getlist('uuid'))
-    return redirect('/profiles/list')
+    return redirect('identities list')
 
 
+@login_required
 def list(request):
-    if not request.user.is_authenticated:
-        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     if not Conf.check_conf():
-        return redirect('/shdb/params')
-    # sh_db_cfg = "shdb.cfg"
+        return redirect('shdb')
     sh_db = sortinghat_db_conn()
-    # uuids = render_profiles(sh_db, request)
-    # return HttpResponse("Listing all profiles: " + json.dumps(uuids))
     return HttpResponse(render_profiles(sh_db, request))
 
 
+@login_required
 def identity(request, identity_id):
     err = None
-    if not request.user.is_authenticated:
-        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     if not Conf.check_conf():
-        return redirect('/shdb/params')
+        return redirect('shdb')
     sh_db = sortinghat_db_conn()
     if request.method == 'POST' and "shsearch" not in request.POST and "table_length" not in request.POST\
             and "page" not in request.POST:
@@ -127,6 +120,7 @@ def identity(request, identity_id):
     return HttpResponse(render_profile(sh_db, identity_id, request, err))
 
 
+@login_required
 def update_enrollment(request, identity_id, organization):
     """
     Update profile enrollment dates
@@ -134,10 +128,8 @@ def update_enrollment(request, identity_id, organization):
     and creates a new one (base on the new dates)
     """
     err = None
-    if not request.user.is_authenticated:
-        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     if not Conf.check_conf():
-        return redirect('/shdb/params')
+        return redirect('shdb')
     if request.method != 'POST':
         return redirect('profiles/list')
     db = sortinghat_db_conn()
@@ -147,76 +139,86 @@ def update_enrollment(request, identity_id, organization):
     end_date = parser.parse(request.POST.get('end_date'))
     sortinghat.api.delete_enrollment(db, identity_id, organization, old_start_date, old_end_date)
     sortinghat.api.add_enrollment(db, identity_id, organization, start_date, end_date)
-    return redirect('/profiles/' + identity_id)
+    return redirect('/hatstall/' + identity_id)
 
 
+@login_required
 def unenroll_profile(request, identity_id, organization_info):
     """
     Un-enroll a profile uuid from an organization
     """
     err = None
-    if not request.user.is_authenticated:
-        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     if not Conf.check_conf():
-        return redirect('/shdb/params')
+        return redirect('shdb')
     if request.method == 'POST':
-        return redirect('/profiles/' + identity_id)
+        return redirect('/hatstall/' + identity_id)
     db = sortinghat_db_conn()
     org_name = organization_info.split('_')[0]
     org_start = parser.parse(organization_info.split('_')[1])
     org_end = parser.parse(organization_info.split('_')[2])
     sortinghat.api.delete_enrollment(db, identity_id, org_name, org_start, org_end)
-    return redirect('/profiles/' + identity_id)
+    return redirect('/hatstall/' + identity_id)
 
 
+@login_required
 def enroll_to_profile(request, identity_id, organization):
     """
     Enroll a profile uuid into an organization
     """
     err = None
-    if not request.user.is_authenticated:
-        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     if not Conf.check_conf():
-        return redirect('/shdb/params')
+        return redirect('shdb')
     if request.method == 'POST':
-        return redirect('/profiles/' + identity_id)
+        return redirect('/hatstall/' + identity_id)
     db = sortinghat_db_conn()
     try:
         sortinghat.api.add_enrollment(db, identity_id, organization)
         err = None
     except sortinghat.exceptions.AlreadyExistsError as error:
         err = error
-    return redirect('/profiles/' + identity_id)
+    return redirect('/hatstall/' + identity_id)
 
 
+@login_required
+def merge_profiles(request):
+    """
+    Merge several profiles from the list of profiles
+
+    :param request: HTTP requests
+    :return: None
+    """
+
+    if request.method == 'POST':
+        err = merge(request.POST.getlist('uuid'))
+    return redirect('identities list')
+
+
+@login_required
 def merge_to_profile(request, identity_id):
     """
     Merge a list of unique profiles to the profile
     """
     err = None
-    if not request.user.is_authenticated:
-        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     if not Conf.check_conf():
-        return redirect('/shdb/params')
+        return redirect('shdb')
     if request.method != 'POST':
-        return redirect('/profiles/' + identity_id)
+        return redirect('/hatstall/' + identity_id)
     uuids = request.POST.getlist('uuid')
     uuids.append(identity_id)
     err = merge(uuids)
-    return redirect('/profiles/' + identity_id)
+    return redirect('/hatstall/' + identity_id)
 
 
+@login_required
 def unmerge(request, profile_uuid, identity_id):
     """
     Unmerge a given identity from a unique identity, creating a new unique identity
     """
     err = None
-    if not request.user.is_authenticated:
-        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     if not Conf.check_conf():
-        return redirect('/shdb/params')
+        return redirect('shdb')
     if request.method != 'GET':
-        return redirect('/profiles/' + profile_uuid)
+        return redirect('/hatstall/' + profile_uuid)
     db = sortinghat_db_conn()
     sortinghat.api.move_identity(db, identity_id, identity_id)
     with db.connect() as session:
@@ -225,18 +227,17 @@ def unmerge(request, profile_uuid, identity_id):
         uid_profile_email = edit_identity.email
         sortinghat.api.edit_profile(db, identity_id, name=uid_profile_name, email=uid_profile_email)
     session.expunge_all()
-    return redirect('/profiles/' + profile_uuid)
+    return redirect('/hatstall/' + profile_uuid)
 
 
+@login_required
 def organizations(request):
     """
     Render organizations page
     """
     err = None
-    if not request.user.is_authenticated:
-        return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
     if not Conf.check_conf():
-        return redirect('/shdb/params')
+        return redirect('shdb')
     db = sortinghat_db_conn()
     if request.method == 'POST':
         try:
@@ -247,10 +248,11 @@ def organizations(request):
     context = {
         "orgs": orgs, "err": err
     }
-    template = loader.get_template('organizations/organizations.html')
+    template = loader.get_template('organizations.html')
     return HttpResponse(template.render(context, request))
 
 
+@login_required
 def get_shdb_params(request, err=None):
     """
     Get the params to configure the connections to SortingHat database
@@ -265,13 +267,13 @@ def get_shdb_params(request, err=None):
             err = error
 
     if Conf.check_conf() and not err:
-        return redirect('/profiles/list')
+        return redirect('identities list')
 
     context = {
         "err": err
     }
 
-    template = loader.get_template('shdb/shdb_form.html')
+    template = loader.get_template('shdb_form.html')
 
     return HttpResponse(template.render(context, request))
 
@@ -283,7 +285,7 @@ def about_render(request, err=None):
     context = {
         "err": err
     }
-    template = loader.get_template('about/about.html')
+    template = loader.get_template('about.html')
     return HttpResponse(template.render(context, request))
 
 
@@ -359,7 +361,7 @@ def render_profiles(db, request, err=None):
             unique_identities.append(uid_dict)
     except sortinghat.exceptions.NotFoundError as error:
         err = error
-    template = loader.get_template('profiles/profiles.html')
+    template = loader.get_template('profiles.html')
     context = {
         "uids": unique_identities, "n_pages": n_pages, "current_page": current_page,
         "shsearch": shsearch, "table_length": table_length, "err": err
@@ -432,7 +434,7 @@ def render_profile(db, profile_uuid, request, err=None):
         "current_page": current_page_profile, "shsearch": shsearch_profile, "table_length": table_length_profile,
         "show_table": show_table, "enrollments": profile_info.enrollments, "countries": countries, "err": err
     }
-    template = loader.get_template('profiles/profile.html')
+    template = loader.get_template('profile.html')
     return template.render(context, request)
 
 

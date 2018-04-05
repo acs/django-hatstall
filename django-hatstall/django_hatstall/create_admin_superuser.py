@@ -27,12 +27,12 @@
 import os
 
 import django
-os.environ['DJANGO_SETTINGS_MODULE'] = 'mysite.settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'django_hatstall.settings'
 django.setup()
 
 from django.contrib.auth.management.commands.createsuperuser import get_user_model
 
-from mysite.settings import DATABASES
+from django_hatstall.settings import DATABASES
 
 admin_db = list(DATABASES.keys())[0]
 admin_user = 'admin'
