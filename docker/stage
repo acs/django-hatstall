@@ -9,6 +9,9 @@ cp shdb.cfg grimoirelab-hatstall/django-hatstall
 
 cd grimoirelab-hatstall/django-hatstall
 
+# Fill the secret key
+./config_secret.py
+
 # Create the data models
 python3 manage.py makemigrations
 python3 manage.py migrate
