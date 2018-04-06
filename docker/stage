@@ -22,4 +22,5 @@ PYTHONPATH=. django_hatstall/create_admin_superuser.py
 # Run the Hatstall service
 echo "Hatstall service ready at http://localhost:8000"
 # python3 manage.py runserver 0.0.0.0:8000
-gunicorn django_hatstall.wsgi --bind 0.0.0.0:8000
+# Wait 60s until timeout, start 3 workers
+gunicorn django_hatstall.wsgi --bind 0.0.0.0:8000 --log-level=debug --workers 3 --timeout 60
