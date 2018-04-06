@@ -2,7 +2,10 @@
 
 # -*- coding: utf-8 -*-
 #
-# Simple script to modify the SECRET_KEY in a django project
+# Simple script to modify the Django settings to deploy:
+#   SECRET_KEY in a django project
+#   DEBUG = False
+#   ALLOWED_HOSTS = ['*']
 #
 # Copyright (C) 2018 Bitergia
 #
@@ -32,9 +35,12 @@ settings_file = 'django_hatstall/settings.py'
 settings = None
 
 with open(settings_file) as f:
-    settings = f.read().replace("SECRET_KEY = ''", "SECRET_KEY = '%s'" % secret)
+    settings = f.read()
+    settings = settings.replace("SECRET_KEY = ''", "SECRET_KEY = '%s'" % secret)
+    settings = settings.replace("DEBUG = True", "DEBUG = False")
+    settings = settings.replace("ALLOWED_HOSTS = []", "ALLOWED_HOSTS = ['*']")
 
 with open(settings_file, "w") as f:
     f.write(settings)
 
-print("SECRET_KEY added to", settings_file)
+print("Django configured for deployment (secret, debug, allowed_hosts) in", settings_file)
