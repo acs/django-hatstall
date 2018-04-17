@@ -7,6 +7,10 @@ git clone https://github.com/chaoss/grimoirelab-hatstall.git
 # Try to copy a config file for SortingHat
 cp shdb.cfg grimoirelab-hatstall/django-hatstall
 
+# Try to copy a config file for apache
+sudo mv /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/000-default.conf.bak
+sudo cp apache-hatstall.conf /etc/apache2/sites-available/000-default.conf
+
 cd grimoirelab-hatstall/django-hatstall
 
 # Fill the secret key, debug false and allow hosts
@@ -19,8 +23,7 @@ python3 manage.py migrate
 # Create the initial admin user: admin/admin
 PYTHONPATH=. django_hatstall/create_admin_superuser.py
 
-# Run the Hatstall service
-echo "Hatstall service ready at http://localhost:8000"
-# python3 manage.py runserver 0.0.0.0:8000
-# Wait 60s until timeout, start 3 workers
-gunicorn django_hatstall.wsgi --bind 0.0.0.0:8000 --log-level=debug --workers 3 --timeout 60
+# Run the Hatstall service with apache2 + mod_wsgi
+cd ../..
+sudo chown -R www-data grimoirelab-hatstall
+sudo apachectl -D FOREGROUND

@@ -1,8 +1,10 @@
 hatstall:
-  image: grimoirelab/hatstall
+  # image: grimoirelab/hatstall
+  image: bitergia/apache-hatstall
   ports:
-        - 8000:8000
-  # volumes:
-  #  - ./stage:/home/grimoirelab/stage
+        - 8000:80
+  volumes:
+    - ./stage:/home/grimoirelab/stage
   #  - ./shdb.cfg:/home/grimoirelab/shdb.cfg
+    - ./apache-hatstall.conf:/home/grimoirelab/apache-hatstall.conf
 
