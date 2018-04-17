@@ -57,7 +57,8 @@ ROOT_URLCONF = 'django_hatstall.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['django_hatstall/templates', 'hatstall/templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'django_hatstall/templates'),
+                 os.path.join(BASE_DIR, 'hatstall/templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -121,4 +122,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = ('django_hatstall/templates/static/',)
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'django_hatstall/templates/static/'),)
