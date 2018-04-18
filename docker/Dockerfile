@@ -23,7 +23,7 @@ RUN apt-get update && \
         python3-venv \
         python3-dev \
         unzip curl wget sudo ssh vim \
-        apache2 libapache2-mod-wsgi-py3 \
+        apache2 libapache2-mod-wsgi-py3 ssl-cert \
         && \
     apt-get clean && \
     find /var/lib/apt/lists -type f -delete

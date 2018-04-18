@@ -8,8 +8,11 @@ git clone https://github.com/chaoss/grimoirelab-hatstall.git
 cp shdb.cfg grimoirelab-hatstall/django-hatstall
 
 # Try to copy a config file for apache
-sudo mv /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/000-default.conf.bak
-sudo cp apache-hatstall.conf /etc/apache2/sites-available/000-default.conf
+sudo a2dissite 000-default && \
+     sudo cp apache-hatstall.conf /etc/apache2/sites-available/ && \
+     sudo a2ensite apache-hatstall && \
+     sudo a2enmod ssl && \
+     sudo service apache2 reload
 
 cd grimoirelab-hatstall/django-hatstall
 
