@@ -25,7 +25,3 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('', RedirectView.as_view(url='/hatstall'))
 ]
-
-# To make static files available from gunicorn
-from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-urlpatterns += staticfiles_urlpatterns()
