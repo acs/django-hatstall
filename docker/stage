@@ -11,8 +11,7 @@ cp shdb.cfg grimoirelab-hatstall/django-hatstall
 sudo a2dissite 000-default && \
      sudo cp apache-hatstall.conf /etc/apache2/sites-available/ && \
      sudo a2ensite apache-hatstall && \
-     sudo a2enmod ssl && \
-     sudo service apache2 reload
+     sudo a2enmod ssl
 
 cd grimoirelab-hatstall/django-hatstall
 
