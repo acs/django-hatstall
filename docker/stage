@@ -1,32 +1,21 @@
 #!/bin/bash
+set -e 
 
-echo "Running Hatstall"
+chown "${DEPLOY_USER}:${DEPLOY_USER}" -R "${DEPLOY_USER_DIR}"
 
-git clone https://github.com/chaoss/grimoirelab-hatstall.git
-
-# Try to copy a config file for SortingHat
-cp shdb.cfg grimoirelab-hatstall/django-hatstall
-
-# Try to copy a config file for apache
-sudo a2dissite 000-default && \
-     sudo cp apache-hatstall.conf /etc/apache2/sites-available/ && \
-     sudo a2ensite apache-hatstall && \
-     sudo a2enmod ssl
-
-cd grimoirelab-hatstall/django-hatstall
-
-# Fill the secret key, debug false and allow hosts
-./config_deployment.py
-
-# Create the data models
-python3 manage.py makemigrations
-python3 manage.py migrate
-python3 manage.py collectstatic --noinput
-
-# Create the initial admin user: admin/admin
-PYTHONPATH=. django_hatstall/create_admin_superuser.py
+su "${DEPLOY_USER}"  -s /bin/bash -c "\
+    pushd ${DEPLOY_USER_DIR}/django-hatstall && \
+    echo 'Fill the secret key, allow hosts'
+    python3 config_deployment.py && \
+    echo 'Create the data models' && \
+    python3 manage.py makemigrations && \
+    python3 manage.py migrate && \
+    python3 manage.py collectstatic --noinput && \
+    echo 'Create the initial admin user: admin/admin' && \
+    PYTHONPATH=. django_hatstall/create_admin_superuser.py
+    "
 
 # Run the Hatstall service with apache2 + mod_wsgi
-cd ../..
-sudo chown -R www-data grimoirelab-hatstall
-sudo apachectl -D FOREGROUND
+echo "Running Hatstall"
+chown -R www-data "${DEPLOY_USER_DIR}"
+apachectl -D FOREGROUND

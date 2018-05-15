@@ -37,10 +37,8 @@ settings = None
 with open(settings_file) as f:
     settings = f.read()
     settings = settings.replace("SECRET_KEY = ''", "SECRET_KEY = '%s'" % secret)
-    settings = settings.replace("DEBUG = True", "DEBUG = False")
-    settings = settings.replace("ALLOWED_HOSTS = []", "ALLOWED_HOSTS = ['*']")
 
 with open(settings_file, "w") as f:
     f.write(settings)
 
-print("Django configured for deployment (secret, debug, allowed_hosts) in", settings_file)
+print("Django configured for deployment (secret) in", settings_file)

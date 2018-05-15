@@ -26,9 +26,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = ''
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('HATSTALL_DEBUG', False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv('HATSTALL_ALLOWED_HOST', '[]')
 
 
 # Application definition
@@ -81,7 +81,7 @@ WSGI_APPLICATION = 'django_hatstall.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': os.getenv('HATSTALL_DATABASE', os.path.join(BASE_DIR, 'db.sqlite3')),
     }
 }
 

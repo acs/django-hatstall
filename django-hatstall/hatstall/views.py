@@ -57,26 +57,25 @@ class Conf():
         Conf.shdb_host = request.POST.get('shdb_host_form')
 
     @staticmethod
-    def parse_shdb_config_file():
+    def parse_shdb_config():
         """
         Returns SortingHat database settings (user, password, name, host) to
         connect to it later
         """
 
         # Check if the file exists
-        if not os.path.exists(Conf.sh_db_cfg):
-            print("Config file not found", Conf.sh_db_cfg)
-            return
-
-        try:
+        if os.path.exists(Conf.sh_db_cfg):
             shdb_config = configparser.ConfigParser()
             shdb_config.read(Conf.sh_db_cfg)
             Conf.shdb_user = shdb_config.get('SHDB_Settings', 'user')
             Conf.shdb_pass = shdb_config.get('SHDB_Settings', 'password')
             Conf.shdb_name = shdb_config.get('SHDB_Settings', 'name')
             Conf.shdb_host = shdb_config.get('SHDB_Settings', 'host')
-        except (configparser.NoSectionError, configparser.NoOptionError) as ex:
-            print("Invalid config file", ex)
+        else:
+            Conf.shdb_user = os.getenv('SHDB_USER', 'sortinghat')
+            Conf.shdb_pass = os.getenv('SHDB_PASSWORD', 'password')
+            Conf.shdb_name = os.getenv('SHDB_NAME', 'sortinghat')
+            Conf.shdb_host = os.getenv('SHDB_HOST', 'sortinghatdb')
 
     @staticmethod
     def check_conf():
@@ -88,7 +87,7 @@ class Conf():
         configured = True
 
         # First try to load always the config from the config file
-        Conf.parse_shdb_config_file()
+        Conf.parse_shdb_config()
 
         if None in [Conf.shdb_user, Conf.shdb_name, Conf.shdb_host, Conf.shdb_pass]:
             configured = False
@@ -312,7 +311,6 @@ def sortinghat_db_conn():
     """
     Returns Sorting Hat database object to work with
     """
-    # shdb_user, shdb_pass, shdb_name, shdb_host = parse_shdb_config_file(filename)
     sortinghat_db = Database(user=Conf.shdb_user, password=Conf.shdb_pass, database=Conf.shdb_name, host=Conf.shdb_host)
 
     return sortinghat_db

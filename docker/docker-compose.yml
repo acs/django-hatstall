@@ -1,9 +1,0 @@
-hatstall:
-  image: grimoirelab/hatstall
-  ports:
-        - 8000:80
-        - 8001:443
-  volumes:
-  #  - ./stage:/home/grimoirelab/stage
-  #  - ./shdb.cfg:/home/grimoirelab/shdb.cfg
-    - ./apache-hatstall.conf:/home/grimoirelab/apache-hatstall.conf

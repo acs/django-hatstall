@@ -1,9 +1,0 @@
-{
-    "grimoirelab": {
-        "git": [
-            "https://github.com/grimoirelab/perceval",
-            "https://github.com/grimoirelab/sortinghat",
-            "https://github.com/grimoirelab/GrimoireELK"
-        ]
-    }
-}
