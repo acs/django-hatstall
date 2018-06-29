@@ -21,6 +21,7 @@ cd grimoirelab-hatstall/django-hatstall
 # Create the data models
 python3 manage.py makemigrations
 python3 manage.py migrate
+python3 manage.py collectstatic --noinput
 
 # Create the initial admin user: admin/admin
 PYTHONPATH=. django_hatstall/create_admin_superuser.py

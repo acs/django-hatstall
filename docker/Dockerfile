@@ -42,7 +42,6 @@ ENV LANG C.UTF-8
 
 # Install pip packages needed
 RUN pip3 install django
-RUN pip3 install gunicorn
 RUN pip3 install python-dateutil
 RUN pip3 install pandas==0.18.1
 RUN pip3 install setuptools
