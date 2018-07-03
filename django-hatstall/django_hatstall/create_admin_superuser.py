@@ -27,16 +27,23 @@
 import os
 
 import django
+from django.contrib.auth.management.commands.createsuperuser import get_user_model
+from django_hatstall.settings import DATABASES
+
 os.environ['DJANGO_SETTINGS_MODULE'] = 'django_hatstall.settings'
 django.setup()
 
-from django.contrib.auth.management.commands.createsuperuser import get_user_model
-
-from django_hatstall.settings import DATABASES
-
 admin_db = list(DATABASES.keys())[0]
-admin_user = 'admin'
-admin_pass = 'admin'
+
+try:
+    admin_user = os.environ['ADMIN_USER']
+except KeyError:
+    admin_user = 'admin'
+
+try:
+    admin_pass = os.environ['ADMIN_PASS']
+except KeyError:
+    admin_pass = 'admin'
 
 db_manager = get_user_model()._default_manager.db_manager(admin_db)
 try:
