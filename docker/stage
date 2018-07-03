@@ -15,6 +15,15 @@ sudo a2dissite 000-default && \
 
 cd grimoirelab-hatstall/django-hatstall
 
+# We make sure the directory where the sqlite3 file is stored has the proper
+# permissions (it will be root:root if using a docker volume)
+if [[ ! -z $DATABASE_DIR ]]; then
+    sudo mkdir -p $DATABASE_DIR
+    sudo chown -R www-data:grimoirelab $DATABASE_DIR
+    sudo chmod -R 770 $DATABASE_DIR
+    sed -e "s|(BASE_DIR, 'db.sqlite3'|(\'$DATABASE_DIR\', 'db.sqlite3'|" -i /home/grimoirelab/grimoirelab-hatstall/django-hatstall/django_hatstall/settings.py
+fi
+
 # Fill the secret key, debug false and allow hosts
 ./config_deployment.py
 
@@ -25,6 +34,13 @@ python3 manage.py collectstatic --noinput
 
 # Create the initial admin user: admin/admin
 PYTHONPATH=. django_hatstall/create_admin_superuser.py
+
+# After creating the sqlite3 file, we make sure the apache user has rw permission
+if [[ ! -z $DATABASE_DIR ]]; then
+    sudo chown -R www-data:grimoirelab $DATABASE_DIR
+    sudo chmod -R 770 $DATABASE_DIR
+fi
+
 
 # Run the Hatstall service with apache2 + mod_wsgi
 cd ../..
