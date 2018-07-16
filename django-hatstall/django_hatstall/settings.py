@@ -22,13 +22,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 # Generate a new one during deployment with:
 # python -c "import random; print(''.join(random.SystemRandom().choice('abcdefghijklmnopqrstuvwxyz0123456789\!@#$%^&*(-_=+)') for i in range(50)))"
-# SECRET_KEY = ''
-SECRET_KEY = ''
+# SECRET_KEY = 'kpncif*j53*ip#e*vkfvhw9=gp0(^x71w!_%soh3b)gh8jz-v)'
+SECRET_KEY = 'kpncif*j53*ip#e*vkfvhw9=gp0(^x71w!_%soh3b)gh8jz-v)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition

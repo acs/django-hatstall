@@ -43,15 +43,32 @@
             </a>
 
             <ul class="navbar-nav">
+
+
+            {% if 'identities' in request.path %}
                 <li class="nav-item">
-                    <a class="nav-link {% if active_page == 'profiles' %} 'active' {% endif %}" href="profiles">Profiles</a>
+                    <a class="nav-link {% if active_page == 'profiles' %} 'active' {% endif %}" href="/identities/hatstall/profiles">Profiles</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if active_page == 'organizations' %} 'active' {% endif %}" href="organizations">Organizations</a>
+                    <a class="nav-link {% if active_page == 'organizations' %} 'active' {% endif %}" href="/identities/hatstall/organizations">Organizations</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if active_page == 'about' %} 'active' {% endif %}" href="about">About</a>
+                    <a class="nav-link {% if active_page == 'about' %} 'active' {% endif %}" href="/identities/hatstall/about">About</a>
                 </li>
+            {% else %}
+                <li class="nav-item">
+                    <a class="nav-link {% if active_page == 'profiles' %} 'active' {% endif %}" href="/hatstall/profiles">Profiles</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if active_page == 'organizations' %} 'active' {% endif %}" href="/hatstall/organizations">Organizations</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if active_page == 'about' %} 'active' {% endif %}" href="/hatstall/about">About</a>
+                </li>
+            {% endif %}
+
+
+
             </ul>
 
         </nav>
