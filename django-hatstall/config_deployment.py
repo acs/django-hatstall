@@ -28,17 +28,24 @@
 #
 #
 
+import os
 import random
 
 secret = ''.join(random.SystemRandom().choice('abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)') for i in range(50))
 settings_file = 'django_hatstall/settings.py'
 settings = None
 
+try:
+    csrf_trusted_origins = os.environ['CSRF_TRUSTED_ORIGINS'].split(" ")
+except KeyError:
+    csrf_trusted_origins = []
+
 with open(settings_file) as f:
     settings = f.read()
     settings = settings.replace("SECRET_KEY = ''", "SECRET_KEY = '%s'" % secret)
     settings = settings.replace("DEBUG = True", "DEBUG = False")
     settings = settings.replace("ALLOWED_HOSTS = []", "ALLOWED_HOSTS = ['*']")
+    settings = settings.replace("CSRF_TRUSTED_ORIGINS = []", "CSRF_TRUSTED_ORIGINS = {}".format(str(csrf_trusted_origins)))
 
 with open(settings_file, "w") as f:
     f.write(settings)
