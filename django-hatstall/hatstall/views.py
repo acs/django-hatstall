@@ -284,7 +284,8 @@ def edit_organization(request, organization):
     if request.method == 'POST':
         try:
             match_orgs = sortinghat.api.registry(db, organization)
-            org_edit_form = match_orgs[0] if match_orgs else None  # Get first result
+            org_edit_form = [org for org in match_orgs if org.name == organization]
+            org_edit_form = org_edit_form[0] if org_edit_form else None  # Get first result
         except sortinghat.exceptions.NotFoundError as error:
             err = error
     # Get data to render view
@@ -339,7 +340,8 @@ def add_domain(request, organization):
             err = error
     # Get data to render view
     match_orgs = sortinghat.api.registry(db, organization)
-    org_edit_form = match_orgs[0] if match_orgs else None  # Get first result
+    org_edit_form = [org for org in match_orgs if org.name == organization]
+    org_edit_form = org_edit_form[0] if org_edit_form else None  # Get first result
     doms_edit_form = [dom.domain for dom in org_edit_form.domains]
     orgs = sortinghat.api.registry(db)
     context = {
@@ -367,7 +369,8 @@ def delete_domain(request, organization, domain):
             err = error
     # Get data to render view
     match_orgs = sortinghat.api.registry(db, organization)
-    org_edit_form = match_orgs[0] if match_orgs else None  # Get first result
+    org_edit_form = [org for org in match_orgs if org.name == organization]
+    org_edit_form = org_edit_form[0] if org_edit_form else None  # Get first result
     doms_edit_form = [dom.domain for dom in org_edit_form.domains]
     orgs = sortinghat.api.registry(db)
     context = {
