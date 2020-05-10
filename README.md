@@ -31,7 +31,8 @@ According to [Harry Potter Wiki](http://harrypotter.wikia.com/wiki/Hatstall) **H
 ```buildoutcfg
 $ git clone https://github.com/chaoss/grimoirelab-hatstall
 $ cd grimoirelab-hatstall
-$ pip3 install -r requirements.txt
+$ pip3 -r requirements.txt
+$ pip3 install .
 ```
 
 ## Usage
